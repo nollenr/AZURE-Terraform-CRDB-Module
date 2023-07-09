@@ -9,14 +9,6 @@ locals {
   join_string = (var.join_string != "" ? var.join_string : join(",", azurerm_network_interface.crdb_network_interface[*].private_ip_address))
 }
 
-locals {
-  tls_private_key = coalesce(var.tls_private_key, tls_private_key.crdb_ca_keys.private_key_pem)
-  tls_public_key  = coalesce(var.tls_private_key, tls_private_key.crdb_ca_keys.public_key_pem)
-  tls_cert        = coalesce(var.tls_self_signed_cert, tls_self_signed_cert.crdb_ca_cert.cert_pem)
-  tls_user_cert   = coalesce(var.tls_locally_signed_cert, tls_locally_signed_cert.user_cert.cert_pem)
-  tls_user_key    = coalesce(var.tls_private_key, tls_private_key.client_keys.private_key_pem)
-}
-
 data "azurerm_ssh_public_key" "ssh_key" {
   name                = var.azure_ssh_key_name
   resource_group_name = var.azure_ssh_key_resource_group
@@ -26,7 +18,7 @@ resource "azurerm_public_ip" "crdb-ip" {
   count                        = 3
   name                         = "${var.owner}-${var.resource_name}-public-ip-${count.index}"
   location                     = var.virtual_network_location
-  resource_group_name          = azurerm_resource_group.rg.name
+  resource_group_name          = local.resource_group_name
   allocation_method            = "Static"
   zones                        = [local.zones[count.index]]
   sku                          = "Standard"
@@ -37,7 +29,7 @@ resource "azurerm_network_interface" "crdb_network_interface" {
   count                     = 3
   name                      = "${var.owner}-${var.resource_name}-ni-${count.index}"
   location                  = var.virtual_network_location
-  resource_group_name       = azurerm_resource_group.rg.name
+  resource_group_name       = local.resource_group_name
   tags                      = local.tags
 
   ip_configuration {
@@ -52,7 +44,7 @@ resource "azurerm_linux_virtual_machine" "crdb-instance" {
   count                 = 3
   name                  = "${var.owner}-${var.resource_name}-vm-crdb-${count.index}"
   location              = var.virtual_network_location
-  resource_group_name   = azurerm_resource_group.rg.name
+  resource_group_name   = local.resource_group_name
   size                  = var.crdb_vm_size
   tags                  = local.tags
 

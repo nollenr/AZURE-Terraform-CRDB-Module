@@ -8,7 +8,7 @@ locals {
 resource "azurerm_virtual_network" "vm01" {
   name                = "${var.owner}-${var.resource_name}-network"
   location            = var.virtual_network_location
-  resource_group_name = azurerm_resource_group.rg.name
+  resource_group_name = local.resource_group_name
   address_space       = [var.virtual_network_cidr]
   tags                = local.tags
 }
@@ -16,7 +16,7 @@ resource "azurerm_virtual_network" "vm01" {
 resource "azurerm_subnet" "sn" {
   count                = 3
   name                 = "${var.owner}-${var.resource_name}-subnet-${count.index}"
-  resource_group_name  = azurerm_resource_group.rg.name
+  resource_group_name  = local.resource_group_name
   virtual_network_name = azurerm_virtual_network.vm01.name
   address_prefixes     = [local.public_subnet_list[count.index]]
   # tags are not a valid argument for subnets
@@ -25,7 +25,7 @@ resource "azurerm_subnet" "sn" {
 resource "azurerm_network_security_group" "desktop-sg" {
     name                = "${var.owner}-${var.resource_name}-sg"
     location            = var.virtual_network_location
-    resource_group_name = azurerm_resource_group.rg.name
+    resource_group_name = local.resource_group_name
     tags                = local.tags
 
     security_rule {

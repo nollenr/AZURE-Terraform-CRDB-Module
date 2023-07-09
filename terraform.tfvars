@@ -2,7 +2,8 @@
 # Globals
 # ----------------------------------------
 owner                      = "nollen"
-resource_name              = "crdb-mr-demo"
+resource_name              = "crdb-mr-demo" # This is NOT the resource group name, but is used to form the resource group name unless it is passed in as multi-region-resource-group-name
+multi_region               = false
 
 # ----------------------------------------
 # My IP Address - security group config

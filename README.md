@@ -11,6 +11,8 @@ To use the HCL, you will need to define an Azure SSH Key -- that will be used fo
 
 ### Run this Terraform Script
 ```terraform
+# See the appendix below to intall Terrafrom, the Azure CLI and logging in to Azure
+
 git clone https://github.com/nollenr/AZURE-Terraform-CRDB-Module.git
 cd AZURE-Terraform-CRDB-Module/
 

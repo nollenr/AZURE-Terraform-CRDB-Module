@@ -3,7 +3,7 @@ resource "azurerm_public_ip" "haproxy-ip" {
     count                        = 1
     name                         = "${var.owner}-${var.resource_name}-public-ip-haproxy"
     location                     = var.virtual_network_location
-    resource_group_name          = azurerm_resource_group.rg.name
+    resource_group_name          = local.resource_group_name
     allocation_method            = "Dynamic"
     sku                          = "Basic"
     tags                         = local.tags
@@ -14,7 +14,7 @@ resource "azurerm_network_interface" "haproxy" {
     count                     = 1
     name                      = "${var.owner}-${var.resource_name}-ni-haproxy"
     location                  = var.virtual_network_location
-    resource_group_name       = azurerm_resource_group.rg.name
+    resource_group_name       = local.resource_group_name
     tags                      = local.tags
 
     ip_configuration {
@@ -29,7 +29,7 @@ resource "azurerm_linux_virtual_machine" "haproxy" {
     count                       = var.include_ha_proxy == "yes" ? 1 : 0
     name                  = "${var.owner}-${var.resource_name}-vm-haproxy"
     location              = var.virtual_network_location
-    resource_group_name   = azurerm_resource_group.rg.name
+    resource_group_name   = local.resource_group_name
     size                  = var.haproxy_vm_size
     tags                  = local.tags
 

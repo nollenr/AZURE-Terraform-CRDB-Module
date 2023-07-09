@@ -16,12 +16,26 @@
 # ----------------------------------------
     variable "resource_name" {
       description = "resource names will usually be the concatenation of var.owner-var.resource_name-resourceType and also a count.index if there are mulitple resources"
-      type=string
-      default = "demo"
+      type        = string
+      default     = "demo"
     }
     variable "owner" {
       description = "Owner of the infrastructure"
       type        = string
+    }
+
+# ----------------------------------------
+# Multi-Region
+# ----------------------------------------    
+    # Please leave these variables as is.  When using this as a module in the multi-region setup, these will be passed in.  For single region, leave as is.  Total hack.
+    variable "multi_region" {
+      type        = bool
+      default     = false
+    }
+    variable "multi_region_resource_group_name" {
+      description = "This will be the resource_group_location"
+      type        = string
+      default     = ""
     }
 
 # ----------------------------------------
@@ -40,6 +54,7 @@
 # Resource Group
 # ----------------------------------------
     variable "resource_group_location" {
+      # you must leave the default as an empty string.  for single region, pass in the value in terraform.tfvars.  for multi-region, pass in the value.
       type    = string
       default = "westeurope"
     }
@@ -54,6 +69,7 @@
       type        = map(string)
       default     = {}
     }
+
 # ----------------------------------------
 # Regions
 # ----------------------------------------

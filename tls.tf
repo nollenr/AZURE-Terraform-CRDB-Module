@@ -1,3 +1,12 @@
+locals {
+  tls_private_key = coalesce(var.tls_private_key, tls_private_key.crdb_ca_keys.private_key_pem)
+  tls_public_key  = coalesce(var.tls_private_key, tls_private_key.crdb_ca_keys.public_key_pem)
+  tls_cert        = coalesce(var.tls_self_signed_cert, tls_self_signed_cert.crdb_ca_cert.cert_pem)
+  tls_user_cert   = coalesce(var.tls_locally_signed_cert, tls_locally_signed_cert.user_cert.cert_pem)
+  tls_user_key    = coalesce(var.tls_private_key, tls_private_key.client_keys.private_key_pem)
+}
+
+
 # -----------------------------------------------------------------------
 #  CRDB Keys and ca.crt
 # -----------------------------------------------------------------------
