@@ -33,7 +33,7 @@ resource "azurerm_network_interface" "crdb_network_interface" {
   tags                      = local.tags
 
   ip_configuration {
-    name                          = "network-interface-${count.index}-ip"
+    name                          = "${var.owner}-${var.resource_name}-ip-${count.index}"
     subnet_id                     = azurerm_subnet.sn[count.index].id
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.crdb-ip[count.index].id
