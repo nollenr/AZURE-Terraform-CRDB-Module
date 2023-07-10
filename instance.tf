@@ -47,6 +47,8 @@ resource "azurerm_linux_virtual_machine" "crdb-instance" {
   resource_group_name   = local.resource_group_name
   size                  = var.crdb_vm_size
   tags                  = local.tags
+  zone                  = local.zones[count.index]
+
 
   network_interface_ids = [azurerm_network_interface.crdb_network_interface[count.index].id]
 
