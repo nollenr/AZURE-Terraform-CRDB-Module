@@ -1,5 +1,7 @@
 # AZURE-Terraform-CRDB-Module
 
+![Resources Created in the Terraform HCL](resources/azure-single-regon.drawio.png)
+
 Terraform HCL to create a multi-node CockroachDB cluster in Azure.   The number of nodes can be a multiple of 3 and nodes will be evenly distributed between 3 Azure Zones.   Optionally, you can include
  - haproxy VM - the proxy will be configured to connect to the cluster
  - app VM - application node that includes software for a multi-region demo
@@ -15,16 +17,25 @@ To use the HCL, you will need to define an Azure SSH Key -- that will be used fo
 
 git clone https://github.com/nollenr/AZURE-Terraform-CRDB-Module.git
 cd AZURE-Terraform-CRDB-Module/
+```
 
-# if you intend to use enterprise features of the database 
+#### if you intend to use enterprise features of the database 
+```
 export TF_VAR_cluster_organization={CLUSTER ORG}
 export TF_VAR_enterprise_license={LICENSE}
+```
 
-# Modify the terraform.tfvars to meet your needs
 
+#### Modify the terraform.tfvars to meet your needs
+
+```
 terraform init
 terraform plan
 terraform apply
+```
+To clean up and remove everything that was created
+
+```
 terraform destroy
 ```
 
