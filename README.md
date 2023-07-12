@@ -6,9 +6,11 @@ Terraform HCL to create a multi-node CockroachDB cluster in Azure.   The number 
  - haproxy VM - the proxy will be configured to connect to the cluster
  - app VM - application node that includes software for a multi-region demo
 
-Security Notes
-firewalld has been disabled on all nodes (cluster, haproxy and app).    A security group is created and assigned with ports 22, 8080 and 26257 opened to a single IP address.  
+## Security Notes
+- `firewalld` has been disabled on all nodes (cluster, haproxy and app).   
+- A security group is created and assigned with ports 22, 8080 and 26257 opened to a single IP address.  The address is configurable as an input variable (my-ip-address)  
 
+## Using the Terraform HCL
 To use the HCL, you will need to define an Azure SSH Key -- that will be used for all VMs created to provide SSH access.
 
 ### Run this Terraform Script
