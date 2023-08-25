@@ -41,7 +41,8 @@ To clean up and remove everything that was created
 terraform destroy
 ```
 
-
+### terraform variable crdb_resize_homelv
+In Azure, any additional space allocated to a disk beyond the size of the image, is available but unused.  Setting the variable `crdb_resize_homelv` to "yes", will cause the user_data script to attempt to resize the home logical volume to take advantage of the additional space.  This is potentially dangerous and should only be used if you're sure that sda2 is the volume group with the homelv partition.  Typically, if you're using the standard redhat source image defined in by the instance.tf you should be fine.  
 
 ## Appendix 
 ### Finding images

@@ -2,7 +2,7 @@
 # Globals
 # ----------------------------------------
 owner                      = "nollen"
-resource_name              = "crdb-mr-demo" # This is NOT the resource group name, but is used to form the resource group name unless it is passed in as multi-region-resource-group-name
+resource_name              = "crdb-five9-poc" # This is NOT the resource group name, but is used to form the resource group name unless it is passed in as multi-region-resource-group-name
 multi_region               = false
 
 # ----------------------------------------
@@ -32,6 +32,8 @@ virtual_network_location   = "westus2"
 # CRDB Instance Specifications
 # ----------------------------------------
 crdb_vm_size               = "Standard_B1ms"
+crdb_disk_size             = 128
+crdb_resize_homelv         = "yes"
 
 # ----------------------------------------
 # CRDB Admin User - Cert Connection
@@ -42,7 +44,7 @@ admin_user_name            = "ron"
 # ----------------------------------------
 # CRDB Specifications
 # ----------------------------------------
-crdb_version               = "23.1.4"
+crdb_version               = "23.1.8"
 
 # ----------------------------------------
 # Cluster Enterprise License Keys
