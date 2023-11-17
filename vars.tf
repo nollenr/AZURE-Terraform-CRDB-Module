@@ -23,6 +23,18 @@
       description = "Owner of the infrastructure"
       type        = string
     }
+    # ----------------------------------------
+    # Create EC2 Instances - for testing purposes
+    # ----------------------------------------
+    variable "create_ec2_instances" {
+      description = "create the ec2 instances (yes/no)?  If set to 'no', then only the VPC, subnets, routes tables, routes, peering, etc are created"
+      type = string
+      default = "yes"
+      validation {
+        condition = contains(["yes", "no"], var.create_ec2_instances)
+        error_message = "Valid value for variable 'create_ec2_instances' is : 'yes' or 'no'"        
+      }
+    }
 
 # ----------------------------------------
 # Multi-Region
@@ -245,6 +257,28 @@
       description = "The Azure instance type for the crdb instances app Instance"
       type        = string
       default     = "t3a.micro"
+    }
+
+    variable "app_disk_size" {
+      description = "Size of the disk attached to the vm"
+      type        = number
+      default     = 64
+      validation {
+        condition = contains([64, 128, 256, 512], var.app_disk_size)
+        error_message = "CRDB Node disk size (in GB) must be 64, 128, 256 or 512"
+      }
+    }
+
+    # Note that app_resize_homelv is dangerous.  Only use this option if you are use the redhat source image and only if you are sure
+    # that sda2 contains the lv "rootvg-homelv".   This procedure will add any unused space to homelv.
+    variable "app_resize_homelv" {
+      description = "When creating a larger disk than exists in the image you'll need to repartition the disk to use the remaining space."
+      type        = string
+      default     = "no"
+      validation {
+        condition = contains(["yes", "no"], var.app_resize_homelv)
+        error_message = "Valid value for variable 'crdb_resize_homelv' is : 'yes' or 'no'"        
+      }  
     }
 
 # ----------------------------------------

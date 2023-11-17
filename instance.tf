@@ -41,7 +41,7 @@ resource "azurerm_network_interface" "crdb_network_interface" {
 }
 
 resource "azurerm_linux_virtual_machine" "crdb-instance" {
-  count                 = 3
+  count                 = var.create_ec2_instances == "yes" ? 3 : 0
   name                  = "${var.owner}-${var.resource_name}-vm-crdb-${count.index}"
   location              = var.virtual_network_location
   resource_group_name   = local.resource_group_name
@@ -74,7 +74,6 @@ resource "azurerm_linux_virtual_machine" "crdb-instance" {
     disk_size_gb = var.crdb_disk_size
   }
 
-  # TODO:  EEEEEEEEEEEEK   add the ha proxy back into the "createnodecert" function!
   # echo "export ip_local=\`curl -H Metadata:true --noproxy \"*\" \"http://169.254.169.254/metadata/instance/network/interface/0/ipv4/ipAddress/0/privateIpAddress?api-version=2017-08-01&format=text\"\`" >> /home/${local.admin_username}/.bashrc
   # echo "export azure_region=\`curl -s -H Metadata:true --noproxy \"*\" \"http://169.254.169.254/metadata/instance/compute/location?api-version=2021-02-01&format=text\"\`" >> /home/${local.admin_username}/.bashrc
 

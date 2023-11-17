@@ -65,6 +65,8 @@ haproxy_vm_size            = "Standard_B1ms"
 # ----------------------------------------
 include_app                = "yes"
 app_vm_size                = "Standard_B1ms"
+app_disk_size              = 64
+app_resize_homelv          = "no"  # if the app_disk_size is greater than 64, then set this to "yes" so that the disk will be resized.  See warnings in vars.tf!
 
 # ----------------------------------------
 # Cluster Location Data - For console map

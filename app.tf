@@ -25,7 +25,7 @@ resource "azurerm_network_interface" "app" {
 
 
 resource "azurerm_linux_virtual_machine" "app" {
-    count                 = var.include_app == "yes" ? 1 : 0
+    count                 = var.include_app == "yes" && var.create_ec2_instances == "yes" ? 1 : 0
     name                  = "${var.owner}-${var.resource_name}-vm-app"
     location              = var.virtual_network_location
     resource_group_name   = local.resource_group_name
@@ -48,17 +48,36 @@ resource "azurerm_linux_virtual_machine" "app" {
         version   = "latest"
     }
 
+    # os_disk {
+    #     name      = "${var.owner}-${var.resource_name}-osdisk-app"
+    #     caching   = "ReadWrite" # possible values: None, ReadOnly and ReadWrite
+    #     storage_account_type = "Standard_LRS" # possible values: Standard_LRS, StandardSSD_LRS, Premium_LRS, Premium_SSD, StandardSSD_ZRS and Premium_ZRS
+    # }
     os_disk {
-        name      = "${var.owner}-${var.resource_name}-osdisk-app"
+        name      = "${var.owner}-${var.resource_name}-app-osdisk"
         caching   = "ReadWrite" # possible values: None, ReadOnly and ReadWrite
         storage_account_type = "Standard_LRS" # possible values: Standard_LRS, StandardSSD_LRS, Premium_LRS, Premium_SSD, StandardSSD_ZRS and Premium_ZRS
+        disk_size_gb = var.app_disk_size
     }
+    
 
     user_data = base64encode(<<EOF
 #!/bin/bash -xe
 echo "Shutting down and disabling firewalld -- SECURITY RISK!!"
 systemctl stop firewalld
 systemctl disable firewalld
+
+if [ "${var.app_resize_homelv}" = "yes" ] 
+then 
+  echo "Attempting to resize /dev/mapper/rootvg-homelv with any space available on the physical volume"
+  echo "Resize the Linux LVM"
+  growpart /dev/sda 2
+  echo "Capture the free space on the device in GB.  The awk command is capturing only the integer portion of the output"
+  ds=`pvs -o name,free --units g --noheadings | awk '{printf "%dG\n", \$2}'`
+  echo "Resizing the logical volume by $ds"
+  lvresize -r -L +$ds /dev/mapper/rootvg-homelv
+fi
+
 yum install git -y
 su ${local.admin_username} -c 'mkdir /home/${local.admin_username}/certs'
 echo '${local.tls_cert}' >> /home/${local.admin_username}/certs/ca.crt 
