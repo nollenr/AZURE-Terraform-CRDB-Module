@@ -34,6 +34,7 @@ virtual_network_location   = "westus2"
 crdb_vm_size               = "Standard_B1ms"
 crdb_disk_size             = 128
 crdb_resize_homelv         = "yes"
+crdb_nodes                 = 3
 
 # ----------------------------------------
 # CRDB Admin User - Cert Connection

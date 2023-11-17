@@ -15,18 +15,18 @@ data "azurerm_ssh_public_key" "ssh_key" {
 }
 
 resource "azurerm_public_ip" "crdb-ip" {
-  count                        = 3
+  count                        = var.crdb_nodes
   name                         = "${var.owner}-${var.resource_name}-public-ip-${count.index}"
   location                     = var.virtual_network_location
   resource_group_name          = local.resource_group_name
   allocation_method            = "Static"
-  zones                        = [local.zones[count.index]]
+  zones                        = [element(local.zones, count.index)]
   sku                          = "Standard"
   tags                         = local.tags
 }
 
 resource "azurerm_network_interface" "crdb_network_interface" {
-  count                     = 3
+  count                     = var.crdb_nodes
   name                      = "${var.owner}-${var.resource_name}-ni-${count.index}"
   location                  = var.virtual_network_location
   resource_group_name       = local.resource_group_name
@@ -34,20 +34,20 @@ resource "azurerm_network_interface" "crdb_network_interface" {
 
   ip_configuration {
     name                          = "${var.owner}-${var.resource_name}-ip-${count.index}"
-    subnet_id                     = azurerm_subnet.sn[count.index].id
+    subnet_id                     = azurerm_subnet.sn[count.index%3].id
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.crdb-ip[count.index].id
   }
 }
 
 resource "azurerm_linux_virtual_machine" "crdb-instance" {
-  count                 = var.create_ec2_instances == "yes" ? 3 : 0
+  count                 = var.create_ec2_instances == "yes" ? var.crdb_nodes : 0
   name                  = "${var.owner}-${var.resource_name}-vm-crdb-${count.index}"
   location              = var.virtual_network_location
   resource_group_name   = local.resource_group_name
   size                  = var.crdb_vm_size
   tags                  = local.tags
-  zone                  = local.zones[count.index]
+  zone                  = local.zones[count.index%3]
 
 
   network_interface_ids = [azurerm_network_interface.crdb_network_interface[count.index].id]
@@ -101,7 +101,7 @@ echo 'export JOIN_STRING="${local.join_string}" ' >> /home/${local.admin_usernam
 echo "export ip_local=${azurerm_network_interface.crdb_network_interface[count.index].private_ip_address}" >> /home/${local.admin_username}/.bashrc
 echo "export ip_public=${azurerm_public_ip.crdb-ip[count.index].ip_address }" >> /home/${local.admin_username}/.bashrc
 echo "export azure_region=${var.virtual_network_location}" >> /home/${local.admin_username}/.bashrc
-echo "export azure_zone=\"${var.virtual_network_location}-${local.zones[count.index]}\"" >> /home/${local.admin_username}/.bashrc
+echo "export azure_zone=\"${var.virtual_network_location}-${local.zones[count.index%3]}\"" >> /home/${local.admin_username}/.bashrc
 echo "export CRDBNODE=${count.index}" >> /home/${local.admin_username}/.bashrc
 export CRDBNODE=${count.index}
 counter=1;for IP in $CLUSTER_PRIVATE_IP_LIST; do echo "export NODE$counter=$IP" >> /home/${local.admin_username}/.bashrc; (( counter++ )); done
