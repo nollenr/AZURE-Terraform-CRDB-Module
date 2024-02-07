@@ -141,7 +141,7 @@ echo "# Create a directory for the binary" >> /home/${local.admin_username}/.bas
 echo "sudo mkdir /var/lib/prometheus" >> /home/${local.admin_username}/.bashrc   
 echo "# Create configuration directories" >> /home/${local.admin_username}/.bashrc   
 echo "for i in rules rules.d files_sd; do" >> /home/${local.admin_username}/.bashrc   
-echo " sudo mkdir -p /etc/prometheus/${i};" >> /home/${local.admin_username}/.bashrc   
+echo " sudo mkdir -p /etc/prometheus/$i;" >> /home/${local.admin_username}/.bashrc   
 echo "done" >> /home/${local.admin_username}/.bashrc   
 echo "# Extract Prometheus" >> /home/${local.admin_username}/.bashrc   
 echo "sudo tar -xvf /tmp/prometheus-2.48.1.linux-amd64.tar.gz --directory /var/lib/prometheus" >> /home/${local.admin_username}/.bashrc   
