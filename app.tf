@@ -109,7 +109,7 @@ echo "sudo pip3 install sqlalchemy~=1.4" >> /home/${local.admin_username}/.bashr
 echo "sudo pip3 install sqlalchemy-cockroachdb" >> /home/${local.admin_username}/.bashrc
 echo "sudo pip3 install psycopg2" >> /home/${local.admin_username}/.bashrc
 
-echo "git clone https://github.com/nollenr/crdb-multi-region-demo.git" >> /home/${local.admin_username}/.bashrc
+echo "git clone https://github.com/nollenr/crdb-multi-region-demo.git?ref=prometheus" >> /home/${local.admin_username}/.bashrc
 echo "echo 'DROP DATABASE IF EXISTS movr_demo;' > crdb-multi-region-demo/sql/db_configure.sql" >> /home/${local.admin_username}/.bashrc
 echo "echo 'CREATE DATABASE movr_demo;' >> crdb-multi-region-demo/sql/db_configure.sql" >> /home/${local.admin_username}/.bashrc
 echo "echo 'ALTER DATABASE movr_demo SET PRIMARY REGION = "\""${var.virtual_network_locations[0]}"\"";' >> crdb-multi-region-demo/sql/db_configure.sql" >> /home/${local.admin_username}/.bashrc
