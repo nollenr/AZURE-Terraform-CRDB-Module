@@ -13,6 +13,9 @@ Terraform HCL to create a multi-node CockroachDB cluster in Azure.   The number 
 ## Using the Terraform HCL
 To use the HCL, you will need to define an Azure SSH Key -- that will be used for all VMs created to provide SSH access.
 
+## Using ARM
+You can provision a cluster using ARM but be careful on the availability of VM resources as the machine types may be limited or non-existant in some regions.  
+
 ### Run this Terraform Script
 ```terraform
 # See the appendix below to intall Terrafrom, the Azure CLI and logging in to Azure

@@ -1,3 +1,16 @@
+Redhat ARM Images
+az vm image list --publisher RedHat --all --output table | grep -i ARM
+|Architecture    |Offer                     |Publisher       |Sku                       |Urn                                                                    |Version
+|--------------  |------------------------  |--------------  |------------------------- |---------------------------------------------------------------------  |-----------------
+|Arm64           |rhel-arm64                |RedHat          |8_6-arm64                 |RedHat:rhel-arm64:8_6-arm64:8.6.2022060901                             |8.6.2022060901
+|Arm64           |rhel-arm64                |RedHat          |8_7-arm64                 |RedHat:rhel-arm64:8_7-arm64:8.7.2023030816                             |8.7.2023030816
+|Arm64           |rhel-arm64                |RedHat          |8_8-arm64-gen2            |RedHat:rhel-arm64:8_8-arm64-gen2:8.8.2023080216                        |8.8.2023080216
+|Arm64           |rhel-arm64                |RedHat          |9_0-arm64                 |RedHat:rhel-arm64:9_0-arm64:9.0.2023011001                             |9.0.2023011001
+|Arm64           |rhel-arm64                |RedHat          |9_1-arm64                 |RedHat:rhel-arm64:9_1-arm64:9.0.2023011002                             |9.0.2023011002
+|Arm64           |rhel-arm64                |RedHat          |9_2-arm64                 |RedHat:rhel-arm64:9_2-arm64:9.2.2023060608                             |9.2.2023060608
+
+
+
 az vm image list --output table
 You are viewing an offline list of images, use --all to retrieve an up-to-date list
 

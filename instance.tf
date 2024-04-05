@@ -9,6 +9,11 @@ locals {
   join_string = (var.join_string != "" ? var.join_string : join(",", azurerm_network_interface.crdb_network_interface[*].private_ip_address))
 }
 
+locals {
+  source_image_reference_offer      = (var.crdb_arm_release == "no" ? "RHEL" : "rhel-arm64")
+  source_image_reference_sku        = (var.crdb_arm_release == "no" ? "8-lvm-gen2" : "8_7-arm64") 
+}
+
 data "azurerm_ssh_public_key" "ssh_key" {
   name                = var.azure_ssh_key_name
   resource_group_name = var.azure_ssh_key_resource_group
@@ -60,9 +65,9 @@ resource "azurerm_linux_virtual_machine" "crdb-instance" {
   }
 
   source_image_reference {
-    offer     = "RHEL"
+    offer     = local.source_image_reference_offer
     publisher = "RedHat"
-    sku       = "8-lvm-gen2"
+    sku       = local.source_image_reference_sku
     version   = "latest"
   }
 
@@ -107,10 +112,18 @@ export CRDBNODE=${count.index}
 counter=1;for IP in $CLUSTER_PRIVATE_IP_LIST; do echo "export NODE$counter=$IP" >> /home/${local.admin_username}/.bashrc; (( counter++ )); done
 
 echo "Downloading and installing CockroachDB along with the Geo binaries"
-curl https://binaries.cockroachdb.com/cockroach-v${var.crdb_version}.linux-amd64.tgz | tar -xz && cp -i cockroach-v${var.crdb_version}.linux-amd64/cockroach /usr/local/bin/
-mkdir -p /usr/local/lib/cockroach
-cp -i cockroach-v${var.crdb_version}.linux-amd64/lib/libgeos.so /usr/local/lib/cockroach/
-cp -i cockroach-v${var.crdb_version}.linux-amd64/lib/libgeos_c.so /usr/local/lib/cockroach/
+if [ "${var.crdb_arm_release}" = "no" ]
+then
+  curl https://binaries.cockroachdb.com/cockroach-v${var.crdb_version}.linux-amd64.tgz | tar -xz && cp -i cockroach-v${var.crdb_version}.linux-amd64/cockroach /usr/local/bin/
+  mkdir -p /usr/local/lib/cockroach
+  cp -i cockroach-v${var.crdb_version}.linux-amd64/lib/libgeos.so /usr/local/lib/cockroach/
+  cp -i cockroach-v${var.crdb_version}.linux-amd64/lib/libgeos_c.so /usr/local/lib/cockroach/
+else
+  curl https://binaries.cockroachdb.com/cockroach-v${var.crdb_version}.linux-arm64.tgz | tar -xz && cp -i cockroach-v${var.crdb_version}.linux-arm64/cockroach /usr/local/bin/
+  mkdir -p /usr/local/lib/cockroach
+  cp -i cockroach-v${var.crdb_version}.linux-arm64/lib/libgeos.so /usr/local/lib/cockroach/
+  cp -i cockroach-v${var.crdb_version}.linux-arm64/lib/libgeos_c.so /usr/local/lib/cockroach/
+fi
 
 echo "Creating the public and private keys"
 su ${local.admin_username} -c 'mkdir /home/${local.admin_username}/certs; mkdir /home/${local.admin_username}/my-safe-directory'

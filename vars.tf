@@ -143,6 +143,16 @@
       }  
     }
 
+    variable "crdb_arm_release" {
+      description = "Do you want to use the ARM version of CRDB?  There are implications on the instances available for the installation.  You must choose the correct instance type or this will fail.  See https://learn.microsoft.com/en-us/azure/virtual-machines/dpsv5-dpdsv5-series"
+      type        = string
+      default     = "no"
+      validation {
+        condition = contains(["yes", "no"], var.crdb_arm_release)
+        error_message = "Valid value for variable 'arm' is : 'yes' or 'no'"        
+      } 
+    }
+
 # ----------------------------------------
 # CRDB Admin User - Cert Connection
 # ----------------------------------------
