@@ -6,6 +6,32 @@ Terraform HCL to create a multi-node CockroachDB cluster in Azure.   The number 
  - haproxy VM - the proxy will be configured to connect to the cluster
  - app VM - application node that includes software for a multi-region demo
 
+# Resource Group Creation Issue
+Starting on 4/28/2024, there were problems with a new release of the terraform provider creating resource groups.   The return code to the terraform HCL is incorrect
+```
+╷
+│ Error: Provider produced inconsistent result after apply
+│
+│ When applying changes to azurerm_resource_group.rg[0], provider "provider[\"registry.terraform.io/hashicorp/azurerm\"]" produced an unexpected new value: Root
+│ object was present, but now absent.
+│
+│ This is a bug in the provider, which should be reported in the provider's own issue tracker.
+╵
+
+```
+As a temporary workaround, until the provider is fixed, you can import the created resource group into the managed terraform state:
+```
+terraform import terraform_id azure_resource_id
+```
+
+```
+terraform import "azurerm_resource_group.rg[0]" "/subscriptions/eebc0b2a-9ff2-499c-9e75-1a32e8fe13b3/resourceGroups/nollen-pgworkload-test-rg"
+```
+
+The `terraform_id` can be found in the error message and the `azure_resource_id` is available from the properties tab in the Azure UI for the resource group.
+
+Once the resource group has been successfully imported, you can re-try `terrform apply`.
+
 ## Security Notes
 - `firewalld` has been disabled on all nodes (cluster, haproxy and app).   
 - A security group is created and assigned with ports 22, 8080 and 26257 opened to a single IP address.  The address is configurable as an input variable (my-ip-address)  
