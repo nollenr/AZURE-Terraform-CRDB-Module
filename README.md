@@ -106,3 +106,15 @@ https://learn.microsoft.com/en-us/azure/virtual-machines/sizes
 User Data that is a static SH 
 https://github.com/guillermo-musumeci/terraform-azure-vm-bootstrapping-2/blob/master/linux-vm-main.tf
 
+
+## Making Sense of the TLS Certs Used in This HCL
+There are a lot of TLS objects (see [tls HCL file](tls.tf) ).  To help make sense of the objects and how they are used in CRDB and VM formation, I created this chart to help -- maybe it does, maybe it doesn't.  
+| Variable | CRDB  Name| TLS | TLS Name | Directory | Note |
+| ------   | ----      | --- | -------- | ----------|  ---- |
+| tls_private_key | ca.key | tls_private_key.crdb_ca_keys.private_key_pem | TLS Private Key PEM| my-safe-directory | Private key -- same key used by all nodes. |
+|tls_public_key|ca.pub|tls_private_key.crdb_ca_keys.public_key_pem|TLS Public Key PEM| certs | cluster public key stored  in the certs directory.  for encoding messages. |
+|tls_cert|ca.crt|tls_self_signed_cert.crdb_ca_cert.cert_pem|TLS Cert PEM| certs | certificate for authenticity |
+|tls_self_signed_cert|ca.crt|tls_self_signed_cert.crdb_ca_cert.cert_pem|TLS Cert PEM| | Duplicate of tls_cert for better naming |
+|tls_user_cert|client.name.crt|tls_locally_signed_cert.user_cert.cert_pem| certs | these are client certs for logging into the database (other than root's cert) | 
+|tls_locally_signed_cert |client.name.crt |tls_locally_signed_cert.user_cert.cert_pem | | Duplicate of tls_user_cert for better naming
+|tls_user_key|client.name.key|tls_private_key.client_keys.private_key_pem| cert | the client private key file associated with the client cert (other than root's cert) |
