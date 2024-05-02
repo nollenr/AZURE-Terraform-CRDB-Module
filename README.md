@@ -106,6 +106,11 @@ https://learn.microsoft.com/en-us/azure/virtual-machines/sizes
 User Data that is a static SH 
 https://github.com/guillermo-musumeci/terraform-azure-vm-bootstrapping-2/blob/master/linux-vm-main.tf
 
+### pgworkload
+To install pgworkload, be sure that the application instance has completed forming (check the .bashrc file for the function "PGWORKLOAD_INSTALL")
+```
+PGWORKLOAD_INSTALL
+```
 
 ## Making Sense of the TLS Certs Used in This HCL
 There are a lot of TLS objects (see [tls HCL file](tls.tf) ).  To help make sense of the objects and how they are used in CRDB and VM formation, I created this chart to help -- maybe it does, maybe it doesn't.  
