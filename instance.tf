@@ -169,6 +169,24 @@ echo "  --certs-dir=certs \\" >> /home/${local.admin_username}/.bashrc
 echo "  --ca-key=my-safe-directory/ca.key" >> /home/${local.admin_username}/.bashrc
 echo "}" >> /home/${local.admin_username}/.bashrc   
 
+echo "Let's Encrypt - snapd and certbot - for database ui certs"
+echo "Creating the UICERT bashrc function"
+echo "UICERT() {" >> /home/${local.admin_username}/.bashrc
+echo "    echo 'The DNS A Record must be set in order for correct resolution of the name.  In AWS, navigate to Hosted Zones  in Route 53.' " >> /home/${local.admin_username}/.bashrc
+echo "    sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm -y" >> /home/${local.admin_username}/.bashrc
+echo "    sudo yum install snapd -y" >> /home/${local.admin_username}/.bashrc
+echo "    sudo systemctl enable --now snapd.socket" >> /home/${local.admin_username}/.bashrc
+echo "    sudo ln -s /var/lib/snapd/snap /snap" >> /home/${local.admin_username}/.bashrc
+echo "    sudo systemctl restart snapd.seeded.service" >> /home/${local.admin_username}/.bashrc
+echo "    sudo snap install --classic certbot" >> /home/${local.admin_username}/.bashrc
+echo "    sudo ln -s /snap/bin/certbot /usr/bin/certbot" >> /home/${local.admin_username}/.bashrc
+echo "    sudo certbot certonly --standalone --non-interactive --agree-tos -m nollen@cockroachlabs.com -d crdb.nollen.click" >> /home/${local.admin_username}/.bashrc
+echo "    sudo cp /etc/letsencrypt/live/crdb.nollen.click/cert.pem /home/adminuser/certs/ui.crt" >> /home/${local.admin_username}/.bashrc
+echo "    sudo cp /etc/letsencrypt/live/crdb.nollen.click/privkey.pem /home/adminuser/certs/ui.key" >> /home/${local.admin_username}/.bashrc
+echo "    sudo chown adminuser:adminuser /home/adminuser/certs/ui.*" >> /home/${local.admin_username}/.bashrc
+echo "    pkill -SIGHUP -x cockroach" >> /home/${local.admin_username}/.bashrc
+echo "}" >> /home/${local.admin_username}/.bashrc   
+
 echo "Creating the STARTCRDB bashrc function"
 echo "STARTCRDB() {" >> /home/${local.admin_username}/.bashrc
 echo "  cockroach start \\" >> /home/${local.admin_username}/.bashrc

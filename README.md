@@ -6,32 +6,6 @@ Terraform HCL to create a multi-node CockroachDB cluster in Azure.   The number 
  - haproxy VM - the proxy will be configured to connect to the cluster
  - app VM - application node that includes software for a multi-region demo
 
-# Resource Group Creation Issue
-Starting on 4/28/2024, there were problems with a new release of the terraform provider creating resource groups.   The return code to the terraform HCL is incorrect
-```
-╷
-│ Error: Provider produced inconsistent result after apply
-│
-│ When applying changes to azurerm_resource_group.rg[0], provider "provider[\"registry.terraform.io/hashicorp/azurerm\"]" produced an unexpected new value: Root
-│ object was present, but now absent.
-│
-│ This is a bug in the provider, which should be reported in the provider's own issue tracker.
-╵
-
-```
-As a temporary workaround, until the provider is fixed, you can import the created resource group into the managed terraform state:
-```
-terraform import terraform_id azure_resource_id
-```
-
-```
-terraform import "azurerm_resource_group.rg[0]" "/subscriptions/eebc0b2a-9ff2-499c-9e75-1a32e8fe13b3/resourceGroups/nollen-pgworkload-test-rg"
-```
-
-The `terraform_id` can be found in the error message and the `azure_resource_id` is available from the properties tab in the Azure UI for the resource group.
-
-Once the resource group has been successfully imported, you can re-try `terrform apply`.
-
 ## Security Notes
 - `firewalld` has been disabled on all nodes (cluster, haproxy and app).   
 - A security group is created and assigned with ports 22, 8080 and 26257 opened to a single IP address.  The address is configurable as an input variable (my-ip-address)  
@@ -112,6 +86,22 @@ To install pgworkload, be sure that the application instance has completed formi
 PGWORKLOAD_INSTALL
 ```
 
+### UI Certificates
+To avoid warnings from the browser when accessing the database UI, the server needs a cert signed by an authority recognized by the browser.  Let's Encrypt provides signed CAs at no charge.  
+
+A function is installed in the `.bashrc` named `IUCERT`.  Running this function will install `snapd` and `certbot` which is used by Let's Encrypt to generate CA certificates.  
+
+https://certbot.eff.org/instructions?ws=other&os=fedora 
+
+https://snapcraft.io/docs/installing-snap-on-red-hat
+
+https://letsencrypt.org/getting-started/
+
+Please note that prior to running the function, you'll need to 
+- open port 80 in the Network Security Group for certbot
+- create a DNS 'A' Record for the domain -- the IP address will is the IP of the CRDB server
+- edit the `UICERT` function and replace the domain on the `certbot` call with your domain name
+
 ## Making Sense of the TLS Certs Used in This HCL
 There are a lot of TLS objects (see [tls HCL file](tls.tf) ).  To help make sense of the objects and how they are used in CRDB and VM formation, I created this chart to help -- maybe it does, maybe it doesn't.  
 | Variable | CRDB  Name| TLS | TLS Name | Directory | Note |
@@ -123,3 +113,31 @@ There are a lot of TLS objects (see [tls HCL file](tls.tf) ).  To help make sens
 |tls_user_cert|client.name.crt|tls_locally_signed_cert.user_cert.cert_pem| certs | these are client certs for logging into the database (other than root's cert) | 
 |tls_locally_signed_cert |client.name.crt |tls_locally_signed_cert.user_cert.cert_pem | | Duplicate of tls_user_cert for better naming
 |tls_user_key|client.name.key|tls_private_key.client_keys.private_key_pem| cert | the client private key file associated with the client cert (other than root's cert) |
+
+
+
+# Resource Group Creation Issue
+Starting on 4/28/2024, there were problems with a new release of the terraform provider creating resource groups.   The return code to the terraform HCL is incorrect
+```
+╷
+│ Error: Provider produced inconsistent result after apply
+│
+│ When applying changes to azurerm_resource_group.rg[0], provider "provider[\"registry.terraform.io/hashicorp/azurerm\"]" produced an unexpected new value: Root
+│ object was present, but now absent.
+│
+│ This is a bug in the provider, which should be reported in the provider's own issue tracker.
+╵
+
+```
+As a temporary workaround, until the provider is fixed, you can import the created resource group into the managed terraform state:
+```
+terraform import terraform_id azure_resource_id
+```
+
+```
+terraform import "azurerm_resource_group.rg[0]" "/subscriptions/eebc0b2a-9ff2-499c-9e75-1a32e8fe13b3/resourceGroups/nollen-pgworkload-test-rg"
+```
+
+The `terraform_id` can be found in the error message and the `azure_resource_id` is available from the properties tab in the Azure UI for the resource group.
+
+Once the resource group has been successfully imported, you can re-try `terrform apply`.
