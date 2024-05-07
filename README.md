@@ -99,7 +99,7 @@ https://letsencrypt.org/getting-started/
 
 Please note that prior to running the function, you'll need to 
 - open port 80 in the Network Security Group for certbot
-- create a DNS 'A' Record for the domain -- the IP address will is the IP of the CRDB server
+- create a DNS 'A' Record for the domain -- the IP address will is the IP of the CRDB server.  This needs to be complete before requesting the cert.
 - edit the `UICERT` function and replace the domain on the `certbot` call with your domain name
 
 ## Making Sense of the TLS Certs Used in This HCL
