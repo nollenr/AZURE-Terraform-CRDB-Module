@@ -103,6 +103,11 @@ Please note that prior to running the function, you'll need to
 - edit the `UICERT` function and replace the domain on the `certbot` call with your domain name
 
 ## Making Sense of the TLS Certs Used in This HCL
+https://www.cockroachlabs.com/docs/v23.2/create-security-certificates-custom-ca
+
+https://www.cockroachlabs.com/docs/v23.2/security-reference/transport-layer-security#trust-store
+
+
 There are a lot of TLS objects (see [tls HCL file](tls.tf) ).  To help make sense of the objects and how they are used in CRDB and VM formation, I created this chart to help -- maybe it does, maybe it doesn't.  
 | Variable | CRDB  Name| TLS | TLS Name | Directory | Note |
 | ------   | ----      | --- | -------- | ----------|  ---- |
