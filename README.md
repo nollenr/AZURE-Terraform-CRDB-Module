@@ -1,5 +1,18 @@
 # AZURE-Terraform-CRDB-Module
 
+## TL;DR
+```
+git clone https://github.com/nollenr/AZURE-Terraform-CRDB-Module.git
+cd AZURE-Terraform-CRDB-Module/
+```
+
+Edit the `terraform.tfvars` file.
+
+```
+terraform init
+terraform apply
+```
+
 ![Resources Created in the Terraform HCL](resources/azure-single-regon.drawio.png)
 
 Terraform HCL to create a multi-node CockroachDB cluster in Azure.   The number of nodes can be a multiple of 3 and nodes will be evenly distributed between 3 Azure Zones.   Optionally, you can include
@@ -89,6 +102,10 @@ PGWORKLOAD_INSTALL
 ### UI Certificates
 To avoid warnings from the browser when accessing the database UI, the server needs a cert signed by an authority recognized by the browser.  Let's Encrypt provides signed CAs at no charge.  
 
+Edit the `terraform.tfvars` to supply:
+- domain name
+- email address assoicated with the domain name
+
 A function is installed in the `.bashrc` named `IUCERT`.  Running this function will install `snapd` and `certbot` which is used by Let's Encrypt to generate CA certificates.  
 
 https://certbot.eff.org/instructions?ws=other&os=fedora 
@@ -98,9 +115,7 @@ https://snapcraft.io/docs/installing-snap-on-red-hat
 https://letsencrypt.org/getting-started/
 
 Please note that prior to running the function, you'll need to 
-- open port 80 in the Network Security Group for certbot
 - create a DNS 'A' Record for the domain -- the IP address will is the IP of the CRDB server.  This needs to be complete before requesting the cert.
-- edit the `UICERT` function and replace the domain on the `certbot` call with your domain name
 
 ## Making Sense of the TLS Certs Used in This HCL
 https://www.cockroachlabs.com/docs/v23.2/create-security-certificates-custom-ca

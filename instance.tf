@@ -169,6 +169,8 @@ echo "  --certs-dir=certs \\" >> /home/${local.admin_username}/.bashrc
 echo "  --ca-key=my-safe-directory/ca.key" >> /home/${local.admin_username}/.bashrc
 echo "}" >> /home/${local.admin_username}/.bashrc   
 
+if [ "${var.include_uicert}" = "yes" ]
+then
 echo "Let's Encrypt - snapd and certbot - for database ui certs"
 echo "Creating the UICERT bashrc function"
 echo "UICERT() {" >> /home/${local.admin_username}/.bashrc
@@ -180,12 +182,13 @@ echo "    sudo ln -s /var/lib/snapd/snap /snap" >> /home/${local.admin_username}
 echo "    sudo systemctl restart snapd.seeded.service" >> /home/${local.admin_username}/.bashrc
 echo "    sudo snap install --classic certbot" >> /home/${local.admin_username}/.bashrc
 echo "    sudo ln -s /snap/bin/certbot /usr/bin/certbot" >> /home/${local.admin_username}/.bashrc
-echo "    sudo certbot certonly --standalone --non-interactive --agree-tos -m nollen@cockroachlabs.com -d crdb.nollen.click" >> /home/${local.admin_username}/.bashrc
+echo "    sudo certbot certonly --standalone --non-interactive --agree-tos -m ${uicert_email_address} -d ${uicert_domain_name}" >> /home/${local.admin_username}/.bashrc
 echo "    sudo cp /etc/letsencrypt/live/crdb.nollen.click/cert.pem /home/adminuser/certs/ui.crt" >> /home/${local.admin_username}/.bashrc
 echo "    sudo cp /etc/letsencrypt/live/crdb.nollen.click/privkey.pem /home/adminuser/certs/ui.key" >> /home/${local.admin_username}/.bashrc
 echo "    sudo chown adminuser:adminuser /home/adminuser/certs/ui.*" >> /home/${local.admin_username}/.bashrc
 echo "    pkill -SIGHUP -x cockroach" >> /home/${local.admin_username}/.bashrc
 echo "}" >> /home/${local.admin_username}/.bashrc   
+fi
 
 echo "Creating the STARTCRDB bashrc function"
 echo "STARTCRDB() {" >> /home/${local.admin_username}/.bashrc

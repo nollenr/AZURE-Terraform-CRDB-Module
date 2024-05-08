@@ -77,3 +77,10 @@ app_resize_homelv          = "no"  # if the app_disk_size is greater than 64, th
 # Cluster Location Data - For console map
 # ----------------------------------------
 install_system_location_data = "yes"
+
+# ----------------------------------------
+# UI Cert (so that the database console does not issue "Your connection is not private" warning)
+# ----------------------------------------
+include_uicert             = "yes"
+uicert_domain_name         = "crdb.nollen.click"
+uicert_email_address       = "nollen@cockroachlabs.com"

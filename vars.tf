@@ -295,13 +295,43 @@
 # Demo
 # ----------------------------------------
     variable "include_demo" {
-      description = "'yes' or 'no' to include an HAProxy Instance"
+      description = "'yes' or 'no' "
       type        = string
       default     = "no"
       validation {
         condition = contains(["yes", "no"], var.include_demo)
         error_message = "Valid value for variable 'include_demo' is : 'yes' or 'no'"        
       }
+    }
+
+# ----------------------------------------
+# UI Cert (so that the database console does not issue "Your connection is not private" warning)
+# When accessing the database console on 8080, unless there is a certificate signed by an authority 
+# accepted by the browser, an error message will be displayed.  If you have a domain name and can 
+# associate the IP of the CRDB via a DNS "A" record, then a certifiate can be generated
+# via Let's Encrypt / certbot.  
+# To generate the cert, FIRST assoicate the public IP of the CRDB node with the domain name
+# and then run the bash function "UICERT".   For certbot to generate the certs, you must 
+# supply the domain name and email address.  
+# ----------------------------------------
+    variable "include_uicert" {
+      description = "'yes' or 'no' to include the UICERT function in the .bashrc of the CRDB instances.  This also opens port 80 to the world on the CRDB instances for certbot."
+      type        = string
+      default     = "no"
+      validation {
+        condition = contains(["yes", "no"], var.include_uicert)
+        error_message = "Valid value for variable 'include_uicert' is : 'yes' or 'no'"        
+      }
+    }
+    variable "uicert_domain_name" {
+      description = "The domain name that will be passed to certbot for the cert."
+      type        = string
+      default     = ""
+    }
+    variable "uicert_email_address" {
+      description = "The email address to be associated with the cert.  This is required if choosing to generate a CA cert for the ui."
+      type        = string
+      default     = ""
     }
 
 # ----------------------------------------
