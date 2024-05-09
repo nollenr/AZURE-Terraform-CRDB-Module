@@ -28,17 +28,6 @@ resource "azurerm_network_security_group" "desktop_sg" {
     resource_group_name = local.resource_group_name
     tags                = local.tags
 
-    security_rule {
-        name                       = "Desktop-Access-To-SSH-HTTP-CRDB"
-        priority                   = 1001
-        direction                  = "Inbound"
-        access                     = "Allow"
-        protocol                   = "*"
-        source_address_prefix      = "${var.my_ip_address}/32"
-        source_port_range          = "*"
-        destination_port_ranges    = [22,26257,8080]
-        destination_address_prefix = "*"
-    }
 }
 
 resource "azurerm_network_security_rule" "desktop_rule" {
@@ -77,5 +66,5 @@ resource "azurerm_network_security_rule" "certbot_rule" {
 resource "azurerm_subnet_network_security_group_association" "desktop-access" {
   count                     = 3
   subnet_id                 = azurerm_subnet.sn[count.index].id
-  network_security_group_id = azurerm_network_security_group.desktop-sg.id
+  network_security_group_id = azurerm_network_security_group.desktop_sg.id
 }

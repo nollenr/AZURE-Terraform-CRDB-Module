@@ -182,7 +182,7 @@ echo "    sudo ln -s /var/lib/snapd/snap /snap" >> /home/${local.admin_username}
 echo "    sudo systemctl restart snapd.seeded.service" >> /home/${local.admin_username}/.bashrc
 echo "    sudo snap install --classic certbot" >> /home/${local.admin_username}/.bashrc
 echo "    sudo ln -s /snap/bin/certbot /usr/bin/certbot" >> /home/${local.admin_username}/.bashrc
-echo "    sudo certbot certonly --standalone --non-interactive --agree-tos -m ${uicert_email_address} -d ${uicert_domain_name}" >> /home/${local.admin_username}/.bashrc
+echo "    sudo certbot certonly --standalone --non-interactive --agree-tos -m ${var.uicert_email_address} -d ${var.uicert_domain_name}" >> /home/${local.admin_username}/.bashrc
 echo "    sudo cp /etc/letsencrypt/live/crdb.nollen.click/cert.pem /home/adminuser/certs/ui.crt" >> /home/${local.admin_username}/.bashrc
 echo "    sudo cp /etc/letsencrypt/live/crdb.nollen.click/privkey.pem /home/adminuser/certs/ui.key" >> /home/${local.admin_username}/.bashrc
 echo "    sudo chown adminuser:adminuser /home/adminuser/certs/ui.*" >> /home/${local.admin_username}/.bashrc
