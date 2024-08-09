@@ -175,6 +175,7 @@ echo "Let's Encrypt - snapd and certbot - for database ui certs"
 echo "Creating the UICERT bashrc function"
 echo "UICERT() {" >> /home/${local.admin_username}/.bashrc
 echo "    echo 'The DNS A Record must be set in order for correct resolution of the name.  In AWS, navigate to Hosted Zones  in Route 53.' " >> /home/${local.admin_username}/.bashrc
+echo "    sudo yum update -y --disablerepo='*' --enablerepo='*microsoft*' " >> /home/${local.admin_username}/.bashrc
 echo "    sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm -y" >> /home/${local.admin_username}/.bashrc
 echo "    sudo yum install snapd -y" >> /home/${local.admin_username}/.bashrc
 echo "    sudo systemctl enable --now snapd.socket" >> /home/${local.admin_username}/.bashrc
