@@ -153,6 +153,16 @@
       } 
     }
 
+    variable "crdb_enable_spot_instances" {
+      description = "Do you want to use SPOT instances?  There are implications on the instances available for the installation.  You must choose the correct instance type or this will fail."
+      type        = string
+      default     = "no"
+      validation {
+        condition = contains(["yes", "no"], var.crdb_enable_spot_instances)
+        error_message = "Valid value for variable 'spot instances' is : 'yes' or 'no'"        
+      } 
+    }
+
 # ----------------------------------------
 # CRDB Admin User - Cert Connection
 # ----------------------------------------

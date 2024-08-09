@@ -54,7 +54,8 @@ resource "azurerm_linux_virtual_machine" "crdb-instance" {
   tags                  = local.tags
   zone                  = local.zones[count.index%3]
 
-
+  priority              = (var.crdb_enable_spot_instances == "no" ? "Regular" : "Spot")
+  eviction_policy       = (var.crdb_enable_spot_instances == "no" ? null : "Delete")
   network_interface_ids = [azurerm_network_interface.crdb_network_interface[count.index].id]
 
   admin_username                  = local.admin_username     # is this still required with an admin_ssh key block?

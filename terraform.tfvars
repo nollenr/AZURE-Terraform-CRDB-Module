@@ -2,7 +2,7 @@
 # Globals
 # ----------------------------------------
 owner                      = "nollen"
-resource_name              = "ruggable-test" # This is NOT the resource group name, but is used to form the resource group name unless it is passed in as multi-region-resource-group-name
+resource_name              = "affirm-mr-demo" # This is NOT the resource group name, but is used to form the resource group name unless it is passed in as multi-region-resource-group-name
 multi_region               = false
 
 # ----------------------------------------
@@ -32,12 +32,13 @@ virtual_network_location   = "westus2"
 # CRDB Instance Specifications
 # ----------------------------------------
 # For ARM installs, you must choose the appropriate VM: Standard_D2ps_v5 (2vCPU), Standard_D4ps_v5, Standard_D8ps_v5, Standard_D16ps_v5, Standard_D32ps_v5, Standard_D48ps_v5, Standard_D64ps_v5
-# crdb_vm_size               = "Standard_B1ms"   # amd64 chip (Standard)
-crdb_vm_size               = "Standard_D2ps_v5"  # arm
+# crdb_vm_size               = "Standard_B1ms"   # amd64 chip (Standard) // 
+crdb_vm_size               = "Standard_D4ps_v5"  # arm (Standard_D2ps_v5 and Standard_D4ps_v5 also allows spot pricing)
 crdb_disk_size             = 128
 crdb_resize_homelv         = "yes"
 crdb_nodes                 = 3
 crdb_arm_release           = "yes"
+crdb_enable_spot_instances = "yes"
 
 # ----------------------------------------
 # CRDB Admin User - Cert Connection
@@ -49,7 +50,7 @@ admin_user_name            = "ron"
 # CRDB Specifications
 # ----------------------------------------
 # For ARM installs, the version must be 23.2.x and above.   
-crdb_version               = "24.1.0-rc.1"
+crdb_version               = "24.1.3"
 
 # ----------------------------------------
 # Cluster Enterprise License Keys
