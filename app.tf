@@ -103,7 +103,7 @@ echo "}" >> /home/${local.admin_username}/.bashrc
 echo " " >> /home/${local.admin_username}/.bashrc   
 
 echo "Installing pgworkload"
-echo "PGWORKLOAD_INSTALL() {" >> /home/${local.admin_username}/.bashrc
+echo "DBWORKLOAD_INSTALL() {" >> /home/${local.admin_username}/.bashrc
 echo "sudo yum install gcc -y" >> /home/${local.admin_username}/.bashrc
 echo "sudo yum install python3.8 -y" >> /home/${local.admin_username}/.bashrc
 echo "sudo yum install python38-devel -y" >> /home/${local.admin_username}/.bashrc
@@ -115,7 +115,7 @@ echo "wget https://raw.githubusercontent.com/fabiog1901/pgworkload/main/workload
 echo "wget https://raw.githubusercontent.com/fabiog1901/pgworkload/main/workloads/bank.sql" >> /home/${local.admin_username}/.bashrc
 echo "wget https://raw.githubusercontent.com/fabiog1901/pgworkload/main/workloads/bank.yaml" >> /home/${local.admin_username}/.bashrc
 echo "cd $HOME" >> /home/${local.admin_username}/.bashrc
-echo "pgworkload --version" >> /home/${local.admin_username}/.bashrc
+echo "dbworkload --version" >> /home/${local.admin_username}/.bashrc
 echo "}" >> /home/${local.admin_username}/.bashrc
 
 echo "Installing and Configuring Demo Function"

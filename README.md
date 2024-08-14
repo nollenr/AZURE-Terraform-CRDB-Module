@@ -93,10 +93,10 @@ https://learn.microsoft.com/en-us/azure/virtual-machines/sizes
 User Data that is a static SH 
 https://github.com/guillermo-musumeci/terraform-azure-vm-bootstrapping-2/blob/master/linux-vm-main.tf
 
-### pgworkload
+### dbworkload
 To install pgworkload, be sure that the application instance has completed forming (check the .bashrc file for the function "PGWORKLOAD_INSTALL")
 ```
-PGWORKLOAD_INSTALL
+DBWORKLOAD_INSTALL
 ```
 
 ### UI Certificates
