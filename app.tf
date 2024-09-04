@@ -67,6 +67,15 @@ echo "Shutting down and disabling firewalld -- SECURITY RISK!!"
 systemctl stop firewalld
 systemctl disable firewalld
 
+echo "Copying the tls_private_key to .ssh/id_rsa, generating the public key and adding it to authorized keys for passwordless ssh between nodes"
+echo '${local.tls_private_key}' >> /home/${local.admin_username}/.ssh/id_rsa.temp
+chmod 600 /home/${local.admin_username}/.ssh/id_rsa.temp
+mv /home/${local.admin_username}/.ssh/id_rsa.temp /home/${local.admin_username}/.ssh/id_rsa
+chown ${local.admin_username}:${local.admin_username} /home/${local.admin_username}/.ssh/id_rsa
+ssh-keygen -y -f /home/${local.admin_username}/.ssh/id_rsa >> /home/${local.admin_username}/.ssh/authorized_keys
+chmod 640 /home/${local.admin_username}/.ssh/authorized_keys
+
+
 if [ "${var.app_resize_homelv}" = "yes" ] 
 then 
   echo "Attempting to resize /dev/mapper/rootvg-homelv with any space available on the physical volume"
