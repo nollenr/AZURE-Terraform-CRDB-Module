@@ -135,29 +135,26 @@ There are a lot of TLS objects (see [tls HCL file](tls.tf) ).  To help make sens
 |tls_user_key|client.name.key|tls_private_key.client_keys.private_key_pem| cert | the client private key file associated with the client cert (other than root's cert) |
 
 
+## Unified Architecture / Physical Cluster Replication (PCR)
+The HCL now allows you to roll out Primary and Standby Clusters for PCR
 
-# Resource Group Creation Issue
-Starting on 4/28/2024, there were problems with a new release of the terraform provider creating resource groups.   The return code to the terraform HCL is incorrect
+Set the appropriate variables in `terraform.tfvars`
 ```
-╷
-│ Error: Provider produced inconsistent result after apply
-│
-│ When applying changes to azurerm_resource_group.rg[0], provider "provider[\"registry.terraform.io/hashicorp/azurerm\"]" produced an unexpected new value: Root
-│ object was present, but now absent.
-│
-│ This is a bug in the provider, which should be reported in the provider's own issue tracker.
-╵
-
-```
-As a temporary workaround, until the provider is fixed, you can import the created resource group into the managed terraform state:
-```
-terraform import terraform_id azure_resource_id
+ua_archiecture_primary_cluster
+ua_archiecture_standby_cluster 
+ua_archiecture_replication_user_name
+ua_archiecture_replication_user_password
 ```
 
-```
-terraform import "azurerm_resource_group.rg[0]" "/subscriptions/eebc0b2a-9ff2-499c-9e75-1a32e8fe13b3/resourceGroups/nollen-pgworkload-test-rg"
-```
+if both primary and standby are set to no, then a standard single tenant cluster is created.
 
-The `terraform_id` can be found in the error message and the `azure_resource_id` is available from the properties tab in the Azure UI for the resource group.
+Set either the primary or standby variable to yes to create a multi-tenant cluster.
 
-Once the resource group has been successfully imported, you can re-try `terrform apply`.
+If the either the primary or standby is set to yes:
+- enterprise license keys are installed
+- the `kv.rangefeed.enabled` is set to true
+- a repliation user with `system replication` authority is created in the `system` tenant
+
+if the standby is set to 'no'
+- admin user is created in the `main` tenant
+
