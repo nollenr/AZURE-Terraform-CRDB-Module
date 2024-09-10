@@ -44,10 +44,24 @@ resource "azurerm_network_security_rule" "desktop_rule" {
     network_security_group_name = azurerm_network_security_group.desktop_sg.name
 }
 
+resource "azurerm_network_security_rule" "netskop_ip_ranges" {
+    name                       = "Netskope-IP-Ranges"
+    priority                   = 1002
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_address_prefixes    = var.whitelist_ips
+    source_port_range          = "*"
+    destination_port_ranges    = [22,26257,8080]
+    destination_address_prefix = "*"
+    resource_group_name         = local.resource_group_name
+    network_security_group_name = azurerm_network_security_group.desktop_sg.name
+}
+
 resource "azurerm_network_security_rule" "certbot_rule" {
     count                      = var.include_uicert == "yes" ? 1 : 0
     name                       = "certbot-open-80-to-world"
-    priority                   = 1002
+    priority                   = 1003
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "*"
