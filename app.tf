@@ -117,12 +117,12 @@ echo "sudo yum install gcc -y" >> /home/${local.admin_username}/.bashrc
 echo "sudo yum install python3.8 -y" >> /home/${local.admin_username}/.bashrc
 echo "sudo yum install python38-devel -y" >> /home/${local.admin_username}/.bashrc
 echo "sudo pip3.8 install -U pip" >> /home/${local.admin_username}/.bashrc
-echo "pip3.8 install dbworkload" >> /home/${local.admin_username}/.bashrc
+echo "pip3.8 install dbworkload[postgres]" >> /home/${local.admin_username}/.bashrc
 echo "mkdir -p \$HOME/workloads/bank" >> /home/${local.admin_username}/.bashrc
 echo "cd \$HOME/workloads/bank" >> /home/${local.admin_username}/.bashrc
-echo "wget https://raw.githubusercontent.com/fabiog1901/pgworkload/main/workloads/bank.py" >> /home/${local.admin_username}/.bashrc
-echo "wget https://raw.githubusercontent.com/fabiog1901/pgworkload/main/workloads/bank.sql" >> /home/${local.admin_username}/.bashrc
-echo "wget https://raw.githubusercontent.com/fabiog1901/pgworkload/main/workloads/bank.yaml" >> /home/${local.admin_username}/.bashrc
+echo "wget https://raw.githubusercontent.com/fabiog1901/dbworkload/main/workloads/postgres/bank.py" >> /home/${local.admin_username}/.bashrc
+echo "wget https://raw.githubusercontent.com/fabiog1901/dbworkload/main/workloads/postgres/bank.sql" >> /home/${local.admin_username}/.bashrc
+echo "wget https://raw.githubusercontent.com/fabiog1901/dbworkload/main/workloads/postgres/bank.yaml" >> /home/${local.admin_username}/.bashrc
 echo "cd $HOME" >> /home/${local.admin_username}/.bashrc
 echo "dbworkload --version" >> /home/${local.admin_username}/.bashrc
 echo "}" >> /home/${local.admin_username}/.bashrc
