@@ -215,7 +215,7 @@
     variable "ua_archiecture_primary_cluster" {
       description = "'yes' or 'no' to pass the '--virtualized' flag during init.  Setting this also enables rangefeeds.  If ua_archiecture_primary_cluster and ua_archiecture_standby_cluster are both 'yes' the cluster will be initialized without the 'virtualized' flag"
       type        = string
-      default     = "yes"
+      default     = "no"
       validation {
         condition = contains(["yes", "no"], var.ua_archiecture_primary_cluster)
         error_message = "Valid value for variable 'ua_archiecture_primary_cluster' is : 'yes' or 'no'"        
@@ -225,7 +225,7 @@
     variable "ua_archiecture_standby_cluster" {
       description = "'yes' or 'no' t o pass the '--virtualized-empty' flag during init. Setting this also enables rangefeeds.  If ua_archiecture_primary_cluster and ua_archiecture_standby_cluster are both 'yes' the cluster will be initialized without the 'virtualized' flag"
       type        = string
-      default     = "yes"
+      default     = "no"
       validation {
         condition = contains(["yes", "no"], var.ua_archiecture_standby_cluster)
         error_message = "Valid value for variable 'ua_archiecture_standby_cluster' is : 'yes' or 'no'"        
