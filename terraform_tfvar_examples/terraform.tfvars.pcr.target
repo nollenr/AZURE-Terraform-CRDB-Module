@@ -1,0 +1,215 @@
+# ----------------------------------------
+# Globals
+# ----------------------------------------
+owner                      = "nollen"
+resource_name              = "pcr-demo-target" # This is NOT the resource group name, but is used to form the resource group name unless it is passed in as multi-region-resource-group-name
+multi_region               = false
+
+# ----------------------------------------
+# My IP Address - security group config
+# ----------------------------------------
+my_ip_address              = "98.148.51.154"
+
+# Azure Locations: "australiacentral,australiacentral2,australiaeast,australiasoutheast,brazilsouth,brazilsoutheast,brazilus,canadacentral,canadaeast,centralindia,centralus,centraluseuap,eastasia,eastus,eastus2,eastus2euap,francecentral,francesouth,germanynorth,germanywestcentral,israelcentral,italynorth,japaneast,japanwest,jioindiacentral,jioindiawest,koreacentral,koreasouth,malaysiasouth,northcentralus,northeurope,norwayeast,norwaywest,polandcentral,qatarcentral,southafricanorth,southafricawest,southcentralus,southeastasia,southindia,swedencentral,swedensouth,switzerlandnorth,switzerlandwest,uaecentral,uaenorth,uksouth,ukwest,westcentralus,westeurope,westindia,westus,westus2,westus3,austriaeast,chilecentral,eastusslv,israelnorthwest,malaysiawest,mexicocentral,newzealandnorth,southeastasiafoundational,spaincentral,taiwannorth,taiwannorthwest"
+# ----------------------------------------
+# Resource Group
+# ----------------------------------------
+resource_group_location    = "westus2"
+
+# ----------------------------------------
+# Existing Key Info
+# ----------------------------------------
+azure_ssh_key_name           = "nollen-az-kp01"
+azure_ssh_key_resource_group = "nollen-resource-group"
+
+# ----------------------------------------
+# Network
+# ----------------------------------------
+virtual_network_cidr       = "192.168.4.0/24"
+virtual_network_location   = "westus2"
+
+# ----------------------------------------
+# CRDB Instance Specifications
+# ----------------------------------------
+# For ARM installs, you must choose the appropriate VM: Standard_D2ps_v5 (2vCPU), Standard_D4ps_v5, Standard_D8ps_v5, Standard_D16ps_v5, Standard_D32ps_v5, Standard_D48ps_v5, Standard_D64ps_v5
+# crdb_vm_size               = "Standard_B1ms"   # amd64 chip (Standard) // 
+crdb_vm_size               = "Standard_D2ps_v5"  # arm (Standard_D2ps_v5 and Standard_D4ps_v5 also allows spot pricing)
+crdb_disk_size             = 64
+crdb_resize_homelv         = "no"
+crdb_nodes                 = 3
+crdb_arm_release           = "yes"
+crdb_enable_spot_instances = "no"
+
+# ----------------------------------------
+# CRDB Admin User - Cert Connection
+# ----------------------------------------
+create_admin_user          = "yes"
+admin_user_name            = "ron"
+
+# ----------------------------------------
+# CRDB Specifications
+# ----------------------------------------
+# For ARM installs, the version must be 23.2.x and above.   
+crdb_version                             = "24.2.1"
+ua_archiecture_primary_cluster           = "no" # both primary and standby can be "no" for a single tenant "regular" cluster.  But if they are both yes, the the cluster will be initialized without any virtualized flag.
+ua_archiecture_standby_cluster           = "yes"
+ua_archiecture_replication_user_name     = "repladmin"
+ua_archiecture_replication_user_password = "repladmin123"
+
+# ----------------------------------------
+# Cluster Enterprise License Keys
+# ----------------------------------------
+# Be sure to do the following in your environment if you plan on installing the license keys
+#   export TF_VAR_cluster_organization='your cluster organization'
+#   export TF_VAR_enterprise_license='your enterprise license'
+install_enterprise_keys   = "yes"
+
+# ----------------------------------------
+# HA Proxy Instance Specifications
+# ----------------------------------------
+include_ha_proxy           = "no"
+haproxy_vm_size            = "Standard_B1ms"
+
+# ----------------------------------------
+# APP Instance Specifications
+# ----------------------------------------
+include_app                = "no"
+app_vm_size                = "Standard_B1ms"
+app_disk_size              = 64
+app_resize_homelv          = "no"  # if the app_disk_size is greater than 64, then set this to "yes" so that the disk will be resized.  See warnings in vars.tf!
+
+# ----------------------------------------
+# Cluster Location Data - For console map
+# ----------------------------------------
+install_system_location_data = "yes"
+
+# ----------------------------------------
+# UI Cert (so that the database console does not issue "Your connection is not private" warning)
+# ----------------------------------------
+include_uicert             = "yes"
+uicert_domain_name         = "crdb.nollen.click"
+uicert_email_address       = "nollen@cockroachlabs.com"
+# ----------------------------------------
+# TLS Vars -- Use values from output of Primary Cluster
+# ----------------------------------------
+tls_private_key         = <<EOT
+-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEAtmFBovFJQn2xAvDAWnXA3YIZEg1v5t+U83TBoXDP1an+yfiX
+rpT575QDBULowezlklDYGfw/Q91DGddZzS/bLxerAhB5PGazutRBgbpkffB+EVSF
+2sJ/54e66LWOAZQ8fYslXfdT6m9d1zOhEIwAB1GtR5J5GSzh+QasWMV/pwtkr6xT
+SUAr4qMCmFdVEwcc8DhO2aXylHxp6omPe0ifi2u1y/rT5as8y4WINMyn7V2b/FoI
+JToWzfFM9MjPPfXxCk+Fs2RqfB1Xho/mR1jHd/ZFLtwcK2oCFdDf+/ETuFaM3+YE
++YMU/fxntDr4y0x6Ah0nfOcC+0f04gbaZe1gywIDAQABAoIBABsEFSD59QwwakQx
+PY0o3ETzvJr7+pOMkxftN7GecGsKH3/znyRxVQS0PC5PVwNDAE7IQvq2bviykfoF
++Ht4l1NGgkJwBkV4QS9vubRp0/ED6ujOSHW7Ug8OABXwrvR07PD757EfrgKQNKpo
+L3ewBWEQLEbp355nE6I75tPPjbVErlxr3RLU4Cjaqr+kLyhmQVwikRZJTYESfkJ2
++0cINuxzXbTS9ps874i0BWf3KBpepXqpOdSJn85+6cqigfUnx2vZCBq6GbSF1vJg
+Scz9/nnG4f4riBPEta6PvuxzGb6DHNyuw+feuqlDg8N2p2Ps50I9v7gzG2U3w6Fh
+ncdxq6ECgYEA8faKhqFnuqEXLAWBz/B18pUjRqJCsgCJyQ2ouSZS/M3VRXDZhVn0
+sbTuGv9U1mfxgLkyp15+OXuLafAYlkXB5yV5bOdlYhQpJW8lyERRamBvu5wLn9wi
+BbEuM/KMdv7iYwsjPcFFA5gemyGH+A2A0/7DBl1AdZOEOn7YNcdLVwUCgYEAwPXU
+cXMo2EOv0T0bYSakvQP1JRhrRjYSFDuRDGPYeL3y/lO6lZTL4fXniSlSsAs0NMEG
+j5AcDaDorKfAqWuNeHJg6OpQ+rrfiRtWY0dHnXDUz0SdDrwCpbUvPNsIrmcNIDzh
+JBP+SpF6TesiGoQXFpU0UNrNlzTXAjBp1ufZwY8CgYBfDt+fQrvwuybSWZuFKM/9
+rI++STLwoXuALEiT7LV/shHOhSY/2HZkdlNw8czPquhbDOcUj/AA/0NnLDdMmj0y
+ZSuOGF5hKNB9b2wlgImHxDlBOG3ssNwA5nnjWK/MdBhWluKSeWJ2pgWoJoU3c36g
+Sp8t2ebgCkNRg9HHVvOHTQKBgQCoWtQMWAmfBw9zY/lrfiflsnpE71VJYQvNE1uu
+j77jOfe05qC4uaZZdA+boK5AYsYd8PwkbfvL+ESJv6NdLjW0jTb4gNg+qqU2Ht/0
+ptBZEYTbgmX14Rv+MGMSmZitccQGCJf2vmrz7JHlQe3zbKQoU+3dTcpqzvN5OXxe
+wNNBCQKBgQCeE9ua73rZFUAw7Vd45hnHttRTKxJjuV86mgIsUOjj2PFZ/tyRCGsE
+9F5K+2L0quN/WL/rpGirMGfozH4TjHAi8/pjtfRxCPRHNVUx1Qu4hUQecXZl10sp
+Ce2hABXCJtAvi9Ij1QENy0ArwP2WtsZdaNtC49/RX2XowXYF2cOugA==
+-----END RSA PRIVATE KEY-----
+
+EOT
+tls_public_key          = <<EOT
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtmFBovFJQn2xAvDAWnXA
+3YIZEg1v5t+U83TBoXDP1an+yfiXrpT575QDBULowezlklDYGfw/Q91DGddZzS/b
+LxerAhB5PGazutRBgbpkffB+EVSF2sJ/54e66LWOAZQ8fYslXfdT6m9d1zOhEIwA
+B1GtR5J5GSzh+QasWMV/pwtkr6xTSUAr4qMCmFdVEwcc8DhO2aXylHxp6omPe0if
+i2u1y/rT5as8y4WINMyn7V2b/FoIJToWzfFM9MjPPfXxCk+Fs2RqfB1Xho/mR1jH
+d/ZFLtwcK2oCFdDf+/ETuFaM3+YE+YMU/fxntDr4y0x6Ah0nfOcC+0f04gbaZe1g
+ywIDAQAB
+-----END PUBLIC KEY-----
+
+EOT
+tls_cert                = <<EOT
+-----BEGIN CERTIFICATE-----
+MIIDaDCCAlCgAwIBAgIRAOPIuG33qeFW2liXCTU5PF4wDQYJKoZIhvcNAQELBQAw
+KzESMBAGA1UEChMJQ29ja3JvYWNoMRUwEwYDVQQDEwxDb2Nrcm9hY2ggQ0EwHhcN
+MjQwOTEwMTkyMzQ3WhcNMjkxMDI5MTkyMzQ3WjArMRIwEAYDVQQKEwlDb2Nrcm9h
+Y2gxFTATBgNVBAMTDENvY2tyb2FjaCBDQTCCASIwDQYJKoZIhvcNAQEBBQADggEP
+ADCCAQoCggEBALZhQaLxSUJ9sQLwwFp1wN2CGRINb+bflPN0waFwz9Wp/sn4l66U
++e+UAwVC6MHs5ZJQ2Bn8P0PdQxnXWc0v2y8XqwIQeTxms7rUQYG6ZH3wfhFUhdrC
+f+eHuui1jgGUPH2LJV33U+pvXdczoRCMAAdRrUeSeRks4fkGrFjFf6cLZK+sU0lA
+K+KjAphXVRMHHPA4Ttml8pR8aeqJj3tIn4trtcv60+WrPMuFiDTMp+1dm/xaCCU6
+Fs3xTPTIzz318QpPhbNkanwdV4aP5kdYx3f2RS7cHCtqAhXQ3/vxE7hWjN/mBPmD
+FP38Z7Q6+MtMegIdJ3znAvtH9OIG2mXtYMsCAwEAAaOBhjCBgzAOBgNVHQ8BAf8E
+BAMCAf4wQQYDVR0lBDowOAYEVR0lAAYIKwYBBQUHAwIGCCsGAQUFBwMDBggrBgEF
+BQcDBAYIKwYBBQUHAwkGCCsGAQUFBwMBMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0O
+BBYEFKsWC7MjwcCvKX+tQ4SmO/Pd28T0MA0GCSqGSIb3DQEBCwUAA4IBAQBVmLkW
+XoKIHbkWR23IK/GVvw0atM2JHrzlOLGo7oyGtouLObR6HJ5fe7JmLNMMvJKdfq5R
+6ym/M0LP1dYijBZY13C8jJON9T5R45QHyio11hVrrc1+nkYAp0rbV0VL7+PSIY65
+9R7Q9oPQECaWclbtBBZAaHwOTOXjsocFFCeUmCrSXL0etlGKzGRGNGvZv03MDTEt
+P/JpJgnKfhGpasK8BVHFMkvSZ901EXHLXCY8f/rZJtmvX+R2KPy6k0n6W6SA6sg/
+guaRCI44VxEKsLPuDtWY5pL82pT5HcUPlTHLrzn4cXbsQGiD+7w5gMCb5OuXJzpS
+y3o1MGosJEHpo2Go
+-----END CERTIFICATE-----
+
+EOT
+tls_user_cert           = <<EOT
+-----BEGIN CERTIFICATE-----
+MIIDbzCCAlegAwIBAgIRAIibKDTP7BbI2DANqpUPo4swDQYJKoZIhvcNAQELBQAw
+KzESMBAGA1UEChMJQ29ja3JvYWNoMRUwEwYDVQQDEwxDb2Nrcm9hY2ggQ0EwHhcN
+MjQwOTEwMTkyMzQ3WhcNMjkwOTE0MjAyMzQ3WjAiMRIwEAYDVQQKEwlDb2Nrcm9h
+Y2gxDDAKBgNVBAMTA3JvbjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEB
+ALo0x5fYJTf0v9v191Lf9iadhDSpG2t8eetR988EaGrPFyC98nXHaiq8bfne4f/w
+aMQXt9VYdm8MgI0RtAsG/jHijsd1l8chfzvSVEFRa8MrCSbA1qQkND1Frtns35k+
+9iEUTAoFykwVe4o30NOM61nxHqqZiwsX6OLbAt+Y2+4LQOPuj2xCUoxuTGt6Zr4M
+VjPc5nlrxxSl/qzmDObaGL/emalGRYBFHM5T4tIYbzHFpk2Q3HdYi6iFDuc2Bidl
+MePk6NuKlUnN3eo2PN8hpeRXQUV7Qm/TF6hn4pwe1yHeiOA1U3tlAx2ucX9PT5iH
+yJUR/hP+AS1C0Ov7+7S7stMCAwEAAaOBljCBkzAOBgNVHQ8BAf8EBAMCAf4wQQYD
+VR0lBDowOAYEVR0lAAYIKwYBBQUHAwIGCCsGAQUFBwMDBggrBgEFBQcDBAYIKwYB
+BQUHAwkGCCsGAQUFBwMBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUqxYLsyPB
+wK8pf61DhKY7893bxPQwDwYDVR0RBAgwBoIEcm9vdDANBgkqhkiG9w0BAQsFAAOC
+AQEAmeRf8mWQmCpEaoW7fN9fZ4BI0q3k7u8UsFGfJCxLShqFBfZR1c/bKTTYlmXL
+0IAXZK6U0rha6Mb0L1k9yqclPIBCdv+gFc3ohLjHYJ0CBJF8lt5lIWnbfeZnTQP7
+dpRErWHIAuT7NQn1E+pVB/arnJRu47NUYYPkm10vET4BHN9/lGW+3WrzV8IfF9ww
+bemt0DDMLjdz6Juce2X9U9ws8bC1DBe0zId/I6gegMKUyRFI6g9MHWdHifjr4dKo
+9FidsVoUZsktXNK8t2zHJAilny5KkhQ0dj8mC3ts6OwCDUOdIR1h21dEG3cArfWd
+L91yAOWy7uepJ1mUJ41sNEQYJA==
+-----END CERTIFICATE-----
+
+EOT
+tls_user_key            =  <<EOT
+-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEAujTHl9glN/S/2/X3Ut/2Jp2ENKkba3x561H3zwRoas8XIL3y
+dcdqKrxt+d7h//BoxBe31Vh2bwyAjRG0Cwb+MeKOx3WXxyF/O9JUQVFrwysJJsDW
+pCQ0PUWu2ezfmT72IRRMCgXKTBV7ijfQ04zrWfEeqpmLCxfo4tsC35jb7gtA4+6P
+bEJSjG5Ma3pmvgxWM9zmeWvHFKX+rOYM5toYv96ZqUZFgEUczlPi0hhvMcWmTZDc
+d1iLqIUO5zYGJ2Ux4+To24qVSc3d6jY83yGl5FdBRXtCb9MXqGfinB7XId6I4DVT
+e2UDHa5xf09PmIfIlRH+E/4BLULQ6/v7tLuy0wIDAQABAoIBAQCRi5O/Uom09S/K
+JLYPJ1Pl1xVxfAUcvQ0nLMjAHbfoVLrFMvODsD2B7gsgVmDchvO84rUko6LfJiyN
+F5tdSzgBkg78RSQ/2CT1g2+sJpJO2SKsEes0HcBfbEpBuO8Ff7svHAhbhS8czWXl
+Ib+uu+VyRhAsVRvjreqw93OFhpvRsdCVlCX0i/ekLN0ZK5FbwQlJVFPMyJPdhYO5
+kyMTT2s3kKeJLCul890wlJblAPq/8J4eeymvPCptDNkXuIQn6Hr36vC6qO47lSDU
+XF5qxbgymKCn3jT+kzA+CBihHPgLkrPHLi7KjuPORuNaPhur7YrwGgFJ4Yh7YF7q
+2DTfRCDhAoGBAOK5/cyguuxFAaS+x+pY7piBujkfZTOqZNSQ+zPY6u7uBegEdpED
+N5vZwW2iMHSmMkE7pwiNXNgeqn5Rtqs+5Gr//PqclPETjNWagUwTp2FScbMW8Zup
+gc9Oy0vr8kY+YgoOw0muHtSMNdpheUFHuOaw0VUpCLS+q1T+biAFQ/jrAoGBANI/
+d0PTdxtbOMuBmIQ24z7ZMpLMshDFWfSml7eCXNXEeVEdGgsNzTsMc3njBA5AKD+5
+M7gtFHNQpX2zYl7Vh4yRYNsjPD27PVy9tHeKa4Kv0T/b7OMCmyGLLMCKdxoyOPug
+Fzl74xck8VSx0t4zLVcQWv/fzLzCqi7hiNyykjO5AoGAFwNB249E6c5nSE2FBShZ
+r2kbecjSANh+u4Sruqt9zRqjxtUNI9LrxgnoNDSOLojf+PcRETEoB1e1fnTU0bTk
+gmfRSa6y/3U4ikXQceRczOgNWlwt0dr2rhAVWnNsd+zFDrhI4iWmQ3Sn0q6qHBIn
+lmLEHJy5oX7o7QuWKfHe4FkCgYA+fk7dAkYtA3hmRScoZYg2bijyKZXkFkUey0Xd
+bgpaIARPb+8FyhxuqMzKNghGlBtilZIh9IRXomkOa/uZZK7dwXigqmCFmNosbtbt
+kV9TgR8ZdC19bJDf75ZlxMKSLstxP6ynkYN2pax2GEUtdtjLQDlMRSF+Gf6r4K3l
+q855QQKBgC+leAVvGj/SsGf5kd23Dzv/z4jNmfTnnWVp60s2bVCMgufaRgVYtKsd
+vuYZp2RhhveLPDkKtGQckkYZjfP+QKju8XmVm/Q8xX0hHJ8BCUEDbdK8nqKQbLB8
+GYKotRnW+ULzRRcOta0dtumuy01PTKSo+Fd+kXN7HYNUvsffsVWt
+-----END RSA PRIVATE KEY-----
+
+EOT
+
