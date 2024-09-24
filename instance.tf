@@ -91,7 +91,7 @@ resource "azurerm_linux_virtual_machine" "crdb-instance" {
 DISK_NAME="/dev/sdb"
 MOUNT_POINT="/mnt/data"
 # 2. Check if the disk exists (and retry a couple of times before failing)
-MAX_RETRIES=5
+MAX_RETRIES=13
 RETRY_COUNT=0
 
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
@@ -116,7 +116,7 @@ if ! parted -s "$DISK_NAME" print | grep -q "^ 1"; then
     echo "Partitioning $DISK_NAME..."
     parted -s "$DISK_NAME" mklabel gpt # Create a GPT partition table
     parted -s "$DISK_NAME" mkpart primary 0% 100% # Create a single primary partition using all available space
-    DISK_PARTITION="${DISK_NAME}1" # Assuming the first partition is created
+    DISK_PARTITION="$${DISK_NAME}1" # Assuming the first partition is created
 else
     echo "$DISK_NAME is already partitioned."
     DISK_PARTITION=$(parted -s "$DISK_NAME" print | awk '/^ 1 / {print $1}') # Get the first partition
@@ -137,13 +137,15 @@ if [ ! -d "$MOUNT_POINT" ]; then
         exit 1
     fi
 fi
-# 6. Mount the partition
+# 6. Mount the partition and change permissions
 echo "Mounting $DISK_PARTITION to $MOUNT_POINT..."
 mount "$DISK_PARTITION" "$MOUNT_POINT"
 if [ $? -ne 0 ]; then
     echo "Error: Failed to mount $DISK_PARTITION to $MOUNT_POINT."
     exit 1
 fi
+sudo chown adminuser:adminuser /mnt/data
+
 # 7. Get UUID of the partition
 UUID=$(blkid -s UUID -o value "$DISK_PARTITION")
 # 8. Add entry to fstab (with XFS)
