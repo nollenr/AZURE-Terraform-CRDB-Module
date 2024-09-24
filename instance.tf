@@ -85,20 +85,71 @@ resource "azurerm_linux_virtual_machine" "crdb-instance" {
 
   user_data = base64encode(<<EOF
 #!/bin/bash -xe
-if [ "${var.crdb_resize_homelv}" = "yes" ] 
-then 
-  echo "Attempting to resize /dev/mapper/rootvg-homelv with any space available on the physical volume"
-  echo "Resize the Linux LVM"
-  if growpart /dev/sda 2; then
-    echo "sda 2 has been resized"
-  else
-    echo "sda2 did not need to be resized"
-  fi
-  echo "Capture the free space on the device in GB.  The awk command is capturing only the integer portion of the output"
-  ds=`pvs -o name,free --units g --noheadings | awk '{printf "%dG\n", \$2}'`
-  echo "Resizing the logical volume by $ds"
-  lvresize -r -L +$ds /dev/mapper/rootvg-homelv
+
+# Prepare, Mount, and Add a Disk to fstab (with XFS formatting and disk check)
+# 1. Set disk information 
+DISK_NAME="/dev/sdb"
+MOUNT_POINT="/mnt/data"
+# 2. Check if the disk exists (and retry a couple of times before failing)
+MAX_RETRIES=5
+RETRY_COUNT=0
+
+while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+    if [ -b "$DISK_NAME" ]; then
+        echo "Disk $DISK_NAME found!"
+        break  # Exit the loop if the disk is found
+    else
+        RETRY_COUNT=$((RETRY_COUNT + 1))
+        echo "Disk $DISK_NAME not found. Retrying in 2 seconds... (Attempt $RETRY_COUNT/$MAX_RETRIES)"
+        sleep 2
+    fi
+done
+
+if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+    echo "Error: Disk $DISK_NAME not found after $MAX_RETRIES retries."
+    exit 1
 fi
+
+# 3. Partition the disk (if not already partitioned)
+echo "Checking if $DISK_NAME is partitioned..."
+if ! parted -s "$DISK_NAME" print | grep -q "^ 1"; then
+    echo "Partitioning $DISK_NAME..."
+    parted -s "$DISK_NAME" mklabel gpt # Create a GPT partition table
+    parted -s "$DISK_NAME" mkpart primary 0% 100% # Create a single primary partition using all available space
+    DISK_PARTITION="${DISK_NAME}1" # Assuming the first partition is created
+else
+    echo "$DISK_NAME is already partitioned."
+    DISK_PARTITION=$(parted -s "$DISK_NAME" print | awk '/^ 1 / {print $1}') # Get the first partition
+fi
+# 4. Format the partition with XFS
+echo "Formatting $DISK_PARTITION with XFS..."
+mkfs.xfs -f "$DISK_PARTITION"
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to format $DISK_PARTITION."
+    exit 1
+fi
+# 5. Create mount point if it doesn't exist
+if [ ! -d "$MOUNT_POINT" ]; then
+    echo "Creating mount point $MOUNT_POINT..."
+    mkdir -p "$MOUNT_POINT"
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to create mount point $MOUNT_POINT."
+        exit 1
+    fi
+fi
+# 6. Mount the partition
+echo "Mounting $DISK_PARTITION to $MOUNT_POINT..."
+mount "$DISK_PARTITION" "$MOUNT_POINT"
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to mount $DISK_PARTITION to $MOUNT_POINT."
+    exit 1
+fi
+# 7. Get UUID of the partition
+UUID=$(blkid -s UUID -o value "$DISK_PARTITION")
+# 8. Add entry to fstab (with XFS)
+echo "Adding entry to /etc/fstab..."
+echo "UUID=$UUID $MOUNT_POINT xfs defaults 0 2" | tee -a /etc/fstab
+echo "Disk $DISK_NAME (partition $DISK_PARTITION) successfully prepared, mounted to $MOUNT_POINT, and added to fstab."
 
 echo "Shutting down and disabling firewalld -- SECURITY RISK!!"
 systemctl stop firewalld
@@ -200,6 +251,7 @@ echo "  --certs-dir=certs \\" >> /home/${local.admin_username}/.bashrc
 echo '  --advertise-addr=$ip_local \' >> /home/${local.admin_username}/.bashrc
 echo '  --join=$JOIN_STRING \' >> /home/${local.admin_username}/.bashrc
 echo '  --max-offset=250ms \' >> /home/${local.admin_username}/.bashrc
+echo '  --store=/mnt/data \' >> /home/${local.admin_username}/.bashrc
 echo "  --background " >> /home/${local.admin_username}/.bashrc
 echo " }" >> /home/${local.admin_username}/.bashrc
 
@@ -279,4 +331,23 @@ fi
   EOF
 )
   
+}
+
+resource "azurerm_managed_disk" "data_disk" {
+  count                = var.create_ec2_instances == "yes" ? var.crdb_nodes : 0
+  name                 = "${var.owner}-${var.resource_name}-storagedisk-${count.index}"
+  location             = var.virtual_network_location
+  zone                 = local.zones[count.index%3]
+  resource_group_name  = local.resource_group_name
+  storage_account_type = "Premium_LRS"
+  create_option        = "Empty"
+  disk_size_gb         = var.crdb_disk_size
+}
+
+resource "azurerm_virtual_machine_data_disk_attachment" "data_disk_attachment" {
+  count              = var.create_ec2_instances == "yes" ? var.crdb_nodes : 0
+  managed_disk_id    = azurerm_managed_disk.data_disk[count.index].id
+  virtual_machine_id = azurerm_linux_virtual_machine.crdb-instance[count.index].id
+  lun                = "1"
+  caching            = "ReadWrite"
 }
