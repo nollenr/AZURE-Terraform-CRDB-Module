@@ -45,6 +45,25 @@ resource "azurerm_network_interface" "crdb_network_interface" {
   }
 }
 
+resource "azurerm_managed_disk" "data_disk" {
+  count                = var.create_ec2_instances == "yes" ? var.crdb_nodes : 0
+  name                 = "${var.owner}-${var.resource_name}-storagedisk-${count.index}"
+  location             = var.virtual_network_location
+  zone                 = local.zones[count.index%3]
+  resource_group_name  = local.resource_group_name
+  storage_account_type = "Premium_LRS"
+  create_option        = "Empty"
+  disk_size_gb         = var.crdb_store_disk_size
+}
+
+resource "azurerm_virtual_machine_data_disk_attachment" "data_disk_attachment" {
+  count              = var.create_ec2_instances == "yes" ? var.crdb_nodes : 0
+  managed_disk_id    = azurerm_managed_disk.data_disk[count.index].id
+  virtual_machine_id = azurerm_linux_virtual_machine.crdb-instance[count.index].id
+  lun                = "1"
+  caching            = "ReadWrite"
+}
+
 resource "azurerm_linux_virtual_machine" "crdb-instance" {
   count                 = var.create_ec2_instances == "yes" ? var.crdb_nodes : 0
   name                  = "${var.owner}-${var.resource_name}-vm-crdb-${count.index}"
@@ -333,23 +352,4 @@ fi
   EOF
 )
   
-}
-
-resource "azurerm_managed_disk" "data_disk" {
-  count                = var.create_ec2_instances == "yes" ? var.crdb_nodes : 0
-  name                 = "${var.owner}-${var.resource_name}-storagedisk-${count.index}"
-  location             = var.virtual_network_location
-  zone                 = local.zones[count.index%3]
-  resource_group_name  = local.resource_group_name
-  storage_account_type = "Premium_LRS"
-  create_option        = "Empty"
-  disk_size_gb         = var.crdb_store_disk_size
-}
-
-resource "azurerm_virtual_machine_data_disk_attachment" "data_disk_attachment" {
-  count              = var.create_ec2_instances == "yes" ? var.crdb_nodes : 0
-  managed_disk_id    = azurerm_managed_disk.data_disk[count.index].id
-  virtual_machine_id = azurerm_linux_virtual_machine.crdb-instance[count.index].id
-  lun                = "1"
-  caching            = "ReadWrite"
 }
