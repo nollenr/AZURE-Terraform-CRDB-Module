@@ -35,8 +35,7 @@ virtual_network_location   = "westus2"
 # For ARM installs, you must choose the appropriate VM: Standard_D2ps_v5 (2vCPU), Standard_D4ps_v5, Standard_D8ps_v5, Standard_D16ps_v5, Standard_D32ps_v5, Standard_D48ps_v5, Standard_D64ps_v5
 # crdb_vm_size               = "Standard_B1ms"   # amd64 chip (Standard) // 
 crdb_vm_size               = "Standard_D2ps_v5"  # arm (Standard_D2ps_v5 and Standard_D4ps_v5 also allows spot pricing)
-crdb_disk_size             = 64
-crdb_resize_homelv         = "no"
+crdb_store_disk_size       = 64
 crdb_nodes                 = 3
 crdb_arm_release           = "yes"
 crdb_enable_spot_instances = "no"

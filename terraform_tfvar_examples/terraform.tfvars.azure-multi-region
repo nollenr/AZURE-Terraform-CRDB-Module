@@ -35,8 +35,7 @@ virtual_network_cidr_blocks = ["192.168.4.0/24", "192.168.5.0/24", "192.168.6.0/
 # For a 4 vCPU cluster "Standard_D4as_v5", for an ARM Install ""Standard_D2ps_v5" 
 # ----------------------------------------
 crdb_vm_size               = "Standard_D2ps_v5"
-crdb_disk_size             = 128
-crdb_resize_homelv         = "yes"
+crdb_store_disk_size       = 128
 crdb_nodes                 = 3
 crdb_arm_release           = "yes"
 

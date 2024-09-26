@@ -77,7 +77,7 @@ resource "azurerm_linux_virtual_machine" "crdb-instance" {
     name      = "${var.owner}-${var.resource_name}-osdisk-${count.index}"
     caching   = "ReadWrite" # possible values: None, ReadOnly and ReadWrite
     storage_account_type = "Premium_LRS" # possible values: Standard_LRS, StandardSSD_LRS, Premium_LRS, Premium_SSD, StandardSSD_ZRS and Premium_ZRS
-    disk_size_gb = var.crdb_disk_size
+    disk_size_gb = 64
   }
 
   # echo "export ip_local=\`curl -H Metadata:true --noproxy \"*\" \"http://169.254.169.254/metadata/instance/network/interface/0/ipv4/ipAddress/0/privateIpAddress?api-version=2017-08-01&format=text\"\`" >> /home/${local.admin_username}/.bashrc
@@ -343,7 +343,7 @@ resource "azurerm_managed_disk" "data_disk" {
   resource_group_name  = local.resource_group_name
   storage_account_type = "Premium_LRS"
   create_option        = "Empty"
-  disk_size_gb         = var.crdb_disk_size
+  disk_size_gb         = var.crdb_store_disk_size
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "data_disk_attachment" {
