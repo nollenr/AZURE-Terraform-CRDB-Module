@@ -138,7 +138,7 @@ if ! parted -s "$DISK_NAME" print | grep -q "^ 1"; then
     DISK_PARTITION="$${DISK_NAME}1" # Assuming the first partition is created
 else
     echo "$DISK_NAME is already partitioned."
-    DISK_PARTITION=$(parted -s "$DISK_NAME" print | awk '/^ 1 / {print $1}') # Get the first partition
+    DISK_PARTITION=$DISK_NAME$(parted -s "$DISK_NAME" print | awk '/^ 1 / {print $1}') # Get the first partition
 fi
 # 4. Format the partition with XFS
 echo "Formatting $DISK_PARTITION with XFS..."
