@@ -2,7 +2,7 @@
 # Globals
 # ----------------------------------------
 owner                      = "nollen"
-resource_name              = "pcr-demo" # This is NOT the resource group name, but is used to form the resource group name unless it is passed in as multi-region-resource-group-name
+resource_name              = "crdb-demo" # This is NOT the resource group name, but is used to form the resource group name unless it is passed in as multi-region-resource-group-name
 multi_region               = false
 
 # ----------------------------------------
@@ -66,13 +66,13 @@ install_enterprise_keys   = "yes"
 # ----------------------------------------
 # HA Proxy Instance Specifications
 # ----------------------------------------
-include_ha_proxy           = "no"
+include_ha_proxy           = "yes"
 haproxy_vm_size            = "Standard_B1ms"
 
 # ----------------------------------------
 # APP Instance Specifications
 # ----------------------------------------
-include_app                = "no"
+include_app                = "yes"
 app_vm_size                = "Standard_B1ms"
 app_disk_size              = 64
 app_resize_homelv          = "no"  # if the app_disk_size is greater than 64, then set this to "yes" so that the disk will be resized.  See warnings in vars.tf!
