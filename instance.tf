@@ -110,7 +110,7 @@ resource "azurerm_linux_virtual_machine" "crdb-instance" {
 DISK_NAME="/dev/sdb"
 MOUNT_POINT="/mnt/data"
 # 2. Check if the disk exists (and retry a couple of times before failing)
-MAX_RETRIES=121
+MAX_RETRIES=300
 RETRY_COUNT=0
 
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
