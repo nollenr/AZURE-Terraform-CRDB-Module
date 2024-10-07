@@ -140,13 +140,22 @@ else
     echo "$DISK_NAME is already partitioned."
     DISK_PARTITION=$DISK_NAME$(parted -s "$DISK_NAME" print | awk '/^ 1 / {print $1}') # Get the first partition
 fi
+
 # 4. Format the partition with XFS
 echo "Formatting $DISK_PARTITION with XFS..."
-mkfs.xfs -f "$DISK_PARTITION"
-if [ $? -ne 0 ]; then
-    echo "Error: Failed to format $DISK_PARTITION."
-    exit 1
+if lsblk -f | grep -q "^$PARTITION .* [^ ]"; then
+  echo "Partition $PARTITION is already formatted."
+else 
+  echo "Partition $PARTITION is not formatted. Formatting with XFS..."
+  mkfs.xfs -f "$DISK_PARTITION"
+  if [ $? -ne 0 ]; then
+      echo "Error: Failed to format $DISK_PARTITION."
+      exit 1
+  else
+    echo "Partition $PARTITION successfully formatted with XFS."
+  fi
 fi
+
 # 5. Create mount point if it doesn't exist
 if [ ! -d "$MOUNT_POINT" ]; then
     echo "Creating mount point $MOUNT_POINT..."

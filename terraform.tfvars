@@ -37,7 +37,7 @@ crdb_vm_size               = "Standard_D4ps_v5"  # arm (Standard_D2ps_v5 and Sta
 crdb_store_disk_size        = 64
 crdb_nodes                 = 3
 crdb_arm_release           = "yes"
-crdb_enable_spot_instances = "yes"
+crdb_enable_spot_instances = "no"
 
 # ----------------------------------------
 # CRDB Admin User - Cert Connection
@@ -50,7 +50,7 @@ admin_user_name            = "ron"
 # ----------------------------------------
 # For ARM installs, the version must be 23.2.x and above.   
 crdb_version                             = "24.2.0"
-ua_archiecture_primary_cluster           = "yes" # both primary and standby can be "no" for a single tenant "regular" cluster.  But if they are both yes, the the cluster will be initialized without any virtualized flag.
+ua_archiecture_primary_cluster           = "no" # both primary and standby can be "no" for a single tenant "regular" cluster.  But if they are both yes, the the cluster will be initialized without any virtualized flag.
 ua_archiecture_standby_cluster           = "no"
 ua_archiecture_replication_user_name     = "repladmin"
 ua_archiecture_replication_user_password = "repladmin123"
