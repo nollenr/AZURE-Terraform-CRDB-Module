@@ -143,16 +143,16 @@ fi
 
 # 4. Format the partition with XFS
 echo "Formatting $DISK_PARTITION with XFS..."
-if lsblk -f | grep -q "^$PARTITION .* [^ ]"; then
-  echo "Partition $PARTITION is already formatted."
+if lsblk -f | grep -q "^$DISK_PARTITION .* [^ ]"; then
+  echo "Partition $DISK_PARTITION is already formatted."
 else 
-  echo "Partition $PARTITION is not formatted. Formatting with XFS..."
+  echo "Partition $DISK_PARTITION is not formatted. Formatting with XFS..."
   mkfs.xfs -f "$DISK_PARTITION"
   if [ $? -ne 0 ]; then
       echo "Error: Failed to format $DISK_PARTITION."
       exit 1
   else
-    echo "Partition $PARTITION successfully formatted with XFS."
+    echo "Partition $DISK_PARTITION successfully formatted with XFS."
   fi
 fi
 
