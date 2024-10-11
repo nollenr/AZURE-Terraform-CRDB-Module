@@ -19,7 +19,7 @@ resource_group_location    = "westus2"
 # ----------------------------------------
 # Existing Key Info
 # ----------------------------------------
-azure_ssh_key_name           = "nollen-az-kp01"
+azure_ssh_key_name           = "nollen-az-kp02"
 azure_ssh_key_resource_group = "nollen-resource-group"
 
 # ----------------------------------------
