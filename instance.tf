@@ -230,6 +230,24 @@ cp /home/${local.admin_username}/my-safe-directory/ca.key /home/${local.admin_us
 ssh-keygen -y -f /home/${local.admin_username}/.ssh/id_rsa >> /home/${local.admin_username}/.ssh/authorized_keys
 chown ${local.admin_username}:${local.admin_username} /home/${local.admin_username}/.ssh/id_rsa
 
+echo "Creating the systemd service file"
+echo '[Unit]' > /etc/systemd/system/securecockroachdb.service
+echo 'Description=Cockroach Database cluster node' >> /etc/systemd/system/securecockroachdb.service
+echo 'Requires=network.target' >> /etc/systemd/system/securecockroachdb.service
+echo '[Service]' >> /etc/systemd/system/securecockroachdb.service
+echo 'Type=notify' >> /etc/systemd/system/securecockroachdb.service
+echo 'WorkingDirectory=/home/${local.admin_username}' >> /etc/systemd/system/securecockroachdb.service
+echo 'ExecStart=/usr/local/bin/cockroach start --locality=region="${var.virtual_network_location}",zone="${var.virtual_network_location}-${local.zones[count.index%3]}" --certs-dir=certs --advertise-addr=${azurerm_network_interface.crdb_network_interface[count.index].private_ip_address} --join=${local.join_string} --max-offset=250ms --store=/mnt/data' >> /etc/systemd/system/securecockroachdb.service
+echo 'TimeoutStopSec=300' >> /etc/systemd/system/securecockroachdb.service
+echo 'Restart=no' >> /etc/systemd/system/securecockroachdb.service
+echo 'RestartSec=10' >> /etc/systemd/system/securecockroachdb.service
+echo 'StandardOutput=syslog' >> /etc/systemd/system/securecockroachdb.service
+echo 'StandardError=syslog' >> /etc/systemd/system/securecockroachdb.service
+echo 'SyslogIdentifier=cockroach' >> /etc/systemd/system/securecockroachdb.service
+echo 'User=adminuser' >> /etc/systemd/system/securecockroachdb.service
+echo '[Install]' >> /etc/systemd/system/securecockroachdb.service
+echo 'WantedBy=default.target' >> /etc/systemd/system/securecockroachdb.service
+
 echo "Creating the CREATENODECERT bashrc function"
 echo "CREATENODECERT() {" >> /home/${local.admin_username}/.bashrc
 echo "  cockroach cert create-node \\" >> /home/${local.admin_username}/.bashrc
@@ -273,17 +291,36 @@ echo "    pkill -SIGHUP -x cockroach" >> /home/${local.admin_username}/.bashrc
 echo "}" >> /home/${local.admin_username}/.bashrc   
 fi
 
-echo "Creating the STARTCRDB bashrc function"
+echo "Creating the STARTCRDB, STOPCRDB, KILLCRDB, KILLAZCRDB, STARTAZCRDB bashrc functions"
 echo "STARTCRDB() {" >> /home/${local.admin_username}/.bashrc
-echo "  cockroach start \\" >> /home/${local.admin_username}/.bashrc
-echo '  --locality=region="$azure_region",zone="$azure_zone" \' >> /home/${local.admin_username}/.bashrc
-echo "  --certs-dir=certs \\" >> /home/${local.admin_username}/.bashrc
-echo '  --advertise-addr=$ip_local \' >> /home/${local.admin_username}/.bashrc
-echo '  --join=$JOIN_STRING \' >> /home/${local.admin_username}/.bashrc
-echo '  --max-offset=250ms \' >> /home/${local.admin_username}/.bashrc
-echo '  --store=/mnt/data \' >> /home/${local.admin_username}/.bashrc
-echo "  --background " >> /home/${local.admin_username}/.bashrc
+echo "  sudo systemctl start securecockroachdb" >> /home/${local.admin_username}/.bashrc
 echo " }" >> /home/${local.admin_username}/.bashrc
+echo "STOPCRDB() {" >> /home/${local.admin_username}/.bashrc
+echo "  sudo systemctl stop securecockroachdb" >> /home/${local.admin_username}/.bashrc
+echo " }" >> /home/${local.admin_username}/.bashrc
+echo "KILLCRDB() {" >> /home/${local.admin_username}/.bashrc
+echo "  sudo systemctl kill -s SIGKILL securecockroachdb" >> /home/${local.admin_username}/.bashrc
+echo " }" >> /home/${local.admin_username}/.bashrc
+echo 'KILLAZCRDB() {' >> /home/${local.admin_username}/.bashrc
+echo 'for ip in $CLUSTER_PRIVATE_IP_LIST; do' >> /home/${local.admin_username}/.bashrc
+echo '  echo "Connecting to $ip..."' >> /home/${local.admin_username}/.bashrc
+echo '  ssh -o ConnectTimeout=5 "$ip" "KILLCRDB"' >> /home/${local.admin_username}/.bashrc
+echo '  echo "CRDB Killed on  $ip"' >> /home/${local.admin_username}/.bashrc
+echo 'done' >> /home/${local.admin_username}/.bashrc
+echo '}' >> /home/${local.admin_username}/.bashrc
+echo 'STOPAZCRDB() {' >> /home/${local.admin_username}/.bashrc
+echo 'for ip in $CLUSTER_PRIVATE_IP_LIST; do' >> /home/${local.admin_username}/.bashrc
+echo '  echo "Connecting to $ip..."' >> /home/${local.admin_username}/.bashrc
+echo '  ssh -o ConnectTimeout=5 "$ip" "STOPCRDB"' >> /home/${local.admin_username}/.bashrc
+echo '  echo "CRDB Killed on  $ip"' >> /home/${local.admin_username}/.bashrc
+echo 'done' >> /home/${local.admin_username}/.bashrc
+echo '}' >> /home/${local.admin_username}/.bashrcecho 'STARTAZCRDB() {' >> /home/${local.admin_username}/.bashrc
+echo 'for ip in $CLUSTER_PRIVATE_IP_LIST; do' >> /home/${local.admin_username}/.bashrc
+echo '  echo "Connecting to $ip..."' >> /home/${local.admin_username}/.bashrc
+echo '  ssh -o ConnectTimeout=5 "$ip" "STARTCRDB"' >> /home/${local.admin_username}/.bashrc
+echo '  echo "CRDB Started on  $ip"' >> /home/${local.admin_username}/.bashrc
+echo 'done' >> /home/${local.admin_username}/.bashrc
+echo '}' >> /home/${local.admin_username}/.bashrc
 
 echo "Creating the node cert, root cert and starting CRDB"
 sleep 20; su ${local.admin_username} -lc 'CREATENODECERT; CREATEROOTCERT; STARTCRDB'
@@ -297,6 +334,9 @@ echo "    echo export \$variable_name=\$ip >> crdb_node_list" >> /home/${local.a
 echo "  done" >> /home/${local.admin_username}/.bashrc
 echo "  source ./crdb_node_list" >> /home/${local.admin_username}/.bashrc
 echo "}" >> /home/${local.admin_username}/.bashrc
+
+echo "Setting known_hosts for all nodes in the AZ"
+ssh-keyscan ${local.ip_list} >> ~/.ssh/known_hosts
 
 echo "Validating if init needs to be run"
 echo "RunInit: ${var.run_init}  Count.Index: ${count.index}   Count: ${var.crdb_nodes}"

@@ -29,7 +29,12 @@ To use the HCL, you will need to define an Azure SSH Key -- that will be used fo
 ## Using ARM
 You can provision a cluster using ARM but be careful on the availability of VM resources as the machine types may be limited or non-existant in some regions.  
 
-### Run this Terraform Script
+## CRDB Management
+The running CRDB is controlled by systemd.  The system file location is `/etc/systemd/system/securecockroachdb.service`.  The "adminuser" owns the CRDB process, not "cockroach".   If you're having problems check out:
+- `systemctl status securecockroachdb.service`
+- `journalctl -xe`
+
+## Run this Terraform Script
 ```terraform
 # See the appendix below to intall Terrafrom, the Azure CLI and logging in to Azure
 
@@ -59,6 +64,14 @@ terraform destroy
 
 ### terraform variable crdb_resize_homelv
 In Azure, any additional space allocated to a disk beyond the size of the image, is available but unused.  Setting the variable `crdb_resize_homelv` to "yes", will cause the user_data script to attempt to resize the home logical volume to take advantage of the additional space.  This is potentially dangerous and should only be used if you're sure that sda2 is the volume group with the homelv partition.  Typically, if you're using the standard redhat source image defined in by the instance.tf you should be fine.  
+
+## Goodies -- functions in .bashrc
+- STARTCRDB : starts CRDB 
+- STOPCRDB  : stops CRDB
+- KILLCRDB  : kills CRDB
+- STARTAZCRDB : starts all CRDB instances in the current region across all AZs
+- STOPAZCRDB : stops all CRDB instances in the current region across all AZs
+- KILLAZCRDB: kills all CRDB instances in the current region across all AZs
 
 ## Appendix 
 ### Finding images
