@@ -314,7 +314,8 @@ echo '  echo "Connecting to $ip..."' >> /home/${local.admin_username}/.bashrc
 echo '  ssh -o ConnectTimeout=5 "$ip" "STOPCRDB"' >> /home/${local.admin_username}/.bashrc
 echo '  echo "CRDB Killed on  $ip"' >> /home/${local.admin_username}/.bashrc
 echo 'done' >> /home/${local.admin_username}/.bashrc
-echo '}' >> /home/${local.admin_username}/.bashrcecho 'STARTAZCRDB() {' >> /home/${local.admin_username}/.bashrc
+echo '}' >> /home/${local.admin_username}/.bashrc
+echo 'STARTAZCRDB() {' >> /home/${local.admin_username}/.bashrc
 echo 'for ip in $CLUSTER_PRIVATE_IP_LIST; do' >> /home/${local.admin_username}/.bashrc
 echo '  echo "Connecting to $ip..."' >> /home/${local.admin_username}/.bashrc
 echo '  ssh -o ConnectTimeout=5 "$ip" "STARTCRDB"' >> /home/${local.admin_username}/.bashrc
@@ -336,7 +337,7 @@ echo "  source ./crdb_node_list" >> /home/${local.admin_username}/.bashrc
 echo "}" >> /home/${local.admin_username}/.bashrc
 
 echo "Setting known_hosts for all nodes in the AZ"
-ssh-keyscan ${local.ip_list} >> ~/.ssh/known_hosts
+su ${local.admin_username} -lc 'ssh-keyscan ${local.ip_list} >> ~/.ssh/known_hosts'
 
 echo "Validating if init needs to be run"
 echo "RunInit: ${var.run_init}  Count.Index: ${count.index}   Count: ${var.crdb_nodes}"
