@@ -312,7 +312,7 @@ echo 'STOPAZCRDB() {' >> /home/${local.admin_username}/.bashrc
 echo 'for ip in $CLUSTER_PRIVATE_IP_LIST; do' >> /home/${local.admin_username}/.bashrc
 echo '  echo "Connecting to $ip..."' >> /home/${local.admin_username}/.bashrc
 echo '  ssh -o ConnectTimeout=5 "$ip" "STOPCRDB"' >> /home/${local.admin_username}/.bashrc
-echo '  echo "CRDB Killed on  $ip"' >> /home/${local.admin_username}/.bashrc
+echo '  echo "CRDB Stopped on  $ip"' >> /home/${local.admin_username}/.bashrc
 echo 'done' >> /home/${local.admin_username}/.bashrc
 echo '}' >> /home/${local.admin_username}/.bashrc
 echo 'STARTAZCRDB() {' >> /home/${local.admin_username}/.bashrc
